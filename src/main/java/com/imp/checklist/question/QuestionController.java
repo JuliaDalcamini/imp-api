@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("imp/question")
+@RequestMapping("api/question")
 public class QuestionController {
 }

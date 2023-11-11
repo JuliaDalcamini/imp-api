@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("imp/artifact")
+@RequestMapping("api/artifact")
 public class ArtifactController {
     
     private ArtifactService artifactService;

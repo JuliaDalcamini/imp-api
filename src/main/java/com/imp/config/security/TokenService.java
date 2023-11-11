@@ -1,4 +1,4 @@
-package com.imp.security;
+package com.imp.config.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

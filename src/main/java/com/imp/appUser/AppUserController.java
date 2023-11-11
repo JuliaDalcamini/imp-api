@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "imp/home")
+@RequestMapping(path = "api/home")
 public class AppUserController {
 
     private final AppUserService userService;

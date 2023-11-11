@@ -1,0 +1,16 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import Home from "./app/home/Home";
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+	<React.StrictMode>
+		<Home />
+	</React.StrictMode>
+)
+
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://cra.link/PWA
+serviceWorkerRegistration.unregister();
