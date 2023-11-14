@@ -4,7 +4,7 @@ import com.imp.appUser.AppUser;
 import com.imp.auth.AuthenticationDTO;
 import com.imp.auth.LoginResponseDTO;
 import com.imp.project.Project;
-import com.imp.security.TokenService;
+import com.imp.config.security.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

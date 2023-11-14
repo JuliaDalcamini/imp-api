@@ -14,9 +14,9 @@ public class Question {
     private String id;
     private String question;
     private String artifactTypeId;
-    private Severity severity;
+    private String severity;
     private boolean answer;
     private int quantity;
     private String observation;
-    private String defectType;
+    private String defectTypeId;
 }
