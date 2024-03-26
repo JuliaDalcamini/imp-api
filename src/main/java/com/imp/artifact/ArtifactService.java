@@ -1,6 +1,8 @@
 package com.imp.artifact;
 
 import com.imp.appUser.AppUserService;
+import com.imp.priority.moscow.MoscowPriority;
+import com.imp.priority.moscow.MoscowPriorityLevel;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,8 @@ public class ArtifactService {
                 appUserService.getUserLogged().getId(),
                 false,
                 LocalDateTime.now(),
-                LocalDateTime.of(0, 1, 1, 0, 0, 0)
+                LocalDateTime.of(0, 1, 1, 0, 0, 0),
+                new MoscowPriority(MoscowPriorityLevel.COULD_HAVE)
         );
 
         artifactRepository.save(newArtifact);

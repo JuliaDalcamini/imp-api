@@ -10,8 +10,8 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-@Document("checklist-s")
-public class StandardChecklist implements Checklist{
+@Document("checklistTemplate")
+public class ChecklistTemplate implements Checklist{
     @Id
     private java.lang.String id;
     private ArrayList<String> artifactTypes;

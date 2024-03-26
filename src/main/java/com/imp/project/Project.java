@@ -3,7 +3,7 @@ package com.imp.project;
 import com.imp.appUser.AppUserDTO;
 import com.imp.artifact.Artifact;
 import com.imp.checklist.Checklist;
-import com.imp.prioritizationMethod.PrioritizationMethod;
+import com.imp.priority.PriorityMethod;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +23,7 @@ public class Project {
     private String nameProject;
     private LocalDateTime creationDateTime;
     private String creatorId;
-    private PrioritizationMethod prioritizationMethod;
+    private PriorityMethod prioritizationMethod;
     private Checklist checklist;
     private ArrayList<Artifact> artifactsList;
     private ArrayList<AppUserDTO> team;
@@ -31,7 +31,7 @@ public class Project {
     public Project() {
     }
 
-    public Project(String nameProject, LocalDateTime creationDateTime, String creatorId, PrioritizationMethod prioritizationMethod, Checklist checklist, ArrayList<Artifact> artifactsList, ArrayList<AppUserDTO> team) {
+    public Project(String nameProject, LocalDateTime creationDateTime, String creatorId, PriorityMethod prioritizationMethod, Checklist checklist, ArrayList<Artifact> artifactsList, ArrayList<AppUserDTO> team) {
         this.nameProject = nameProject;
         this.creationDateTime = creationDateTime;
         this.creatorId = creatorId;

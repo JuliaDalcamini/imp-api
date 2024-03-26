@@ -5,11 +5,9 @@ import com.imp.appUser.AppUserDTO;
 import com.imp.appUser.AppUserService;
 import com.imp.artifact.Artifact;
 import com.imp.checklist.Checklist;
+import com.imp.checklist.ChecklistTemplate;
 import com.imp.checklist.EmptyChecklist;
-import com.imp.checklist.StandardChecklist;
-import com.imp.prioritizationMethod.MoscowMethod;
-import com.imp.prioritizationMethod.PrioritizationMethod;
-import com.imp.prioritizationMethod.WiegersMethod;
+import com.imp.priority.PriorityMethod;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -64,17 +62,17 @@ public class ProjectService {
         projectRepository.deleteById(id);
     }
 
-    public PrioritizationMethod getPMethod(String pMethod) {
+    public PriorityMethod getPMethod(String pMethod) {
         return switch (pMethod) {
-            case "wiegers" -> new WiegersMethod();
-            case "moscow" -> new MoscowMethod();
+            case "wiegers" -> PriorityMethod.WIEGERS;
+            case "moscow" -> PriorityMethod.MOSCOW;
             default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Método de priorização inválido");
         };
     }
 
     public Checklist getChecklist(String checklistType) {
         return switch (checklistType) {
-            case "standard" -> new StandardChecklist();
+            case "standard" -> new ChecklistTemplate();
             case "empty" -> new EmptyChecklist();
             default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Checklist inválida");
         };
