@@ -44,6 +44,6 @@ class UserRepository(private var database: MongoDatabase) {
     }
 
     companion object {
-        private const val COLLECTION = "user"
+        private const val COLLECTION = "users"
     }
 }

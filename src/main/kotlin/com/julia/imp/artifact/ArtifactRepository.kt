@@ -10,6 +10,6 @@ class ArtifactRepository(private var database: MongoDatabase) {
     }
 
     companion object {
-        private const val COLLECTION = "artifact"
+        private const val COLLECTION = "artifacts"
     }
 }
