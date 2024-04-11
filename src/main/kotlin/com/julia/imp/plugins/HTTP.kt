@@ -15,6 +15,11 @@ fun Application.configureHTTP() {
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Patch)
         allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.Accept)
+        allowHeader(HttpHeaders.Origin)
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Referrer)
+        allowHeader(HttpHeaders.UserAgent)
 
         // TODO: Don't do this in production if possible. Try to limit it.
         anyHost()
