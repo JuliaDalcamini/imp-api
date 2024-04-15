@@ -8,7 +8,7 @@ data class Artifact(
     @BsonId
     val id: ObjectId,
     val name: String,
-    val artifactType: String,
+    val artifactType: ObjectId,
     val creatorId: ObjectId,
     val status: Boolean,
     val creationDateTime: LocalDateTime,
