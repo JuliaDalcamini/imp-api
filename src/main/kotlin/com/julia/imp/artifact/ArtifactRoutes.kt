@@ -14,6 +14,7 @@ import java.time.LocalDateTime
 fun Route.artifactRoutes() {
     artifactCreate()
     artifactDelete()
+    artifactUpdate()
 }
 
 fun Route.artifactCreate() {
@@ -49,11 +50,44 @@ fun Route.artifactCreate() {
 fun Route.artifactDelete() {
     val repository by inject<ArtifactRepository>()
 
-    delete("/artifact/delete") {
-        val request = call.receive<ObjectId>()
+    delete("/artifact/delete/{id}") {
+        val id = call.parameters["id"]
 
-        repository.deleteById(request)
+        repository.deleteById(ObjectId(id))
 
         call.respond(HttpStatusCode.OK)
+    }
+}
+
+fun Route.artifactUpdate() {
+    val repository by inject<ArtifactRepository>()
+
+    authenticate {
+        post("/artifact/update/{id}") {
+            val request = call.receive<ArtifactRequest>()
+            val id = call.parameters["id"]
+
+            val oldArtifact = repository.findById(ObjectId(id))
+
+            if (oldArtifact != null) {
+                repository.updateOne(ObjectId(id),
+                    Artifact(
+                        id = oldArtifact.id,
+                        name = oldArtifact.name,
+                        artifactType = oldArtifact.artifactType,
+                        creatorId = oldArtifact.creatorId,
+                        status = true,
+                        creationDateTime = oldArtifact.creationDateTime,
+                        conclusionDateTime = LocalDateTime.now(),
+                        priority = oldArtifact.priority
+                    )
+                )
+
+                call.respond(HttpStatusCode.OK)
+
+            } else {
+                call.respond(HttpStatusCode.NotFound)
+            }
+        }
     }
 }
