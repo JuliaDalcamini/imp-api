@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 data class Project(
     @BsonId
     val id: ObjectId,
-    private var nameProject: String,
+    val nameProject: String,
     val creationDateTime: LocalDateTime,
     val creatorId: String,
     val prioritizationMethod: PrioritizationMethod,

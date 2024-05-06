@@ -8,9 +8,9 @@ import org.bson.types.ObjectId
 
 class ArtifactRepository(private var database: MongoDatabase) {
 
-    suspend fun insertOne(artifact: Artifact): Boolean {
+    suspend fun insertOne(artifact: Artifact): String? {
         val result = database.getCollection<Artifact>(COLLECTION).insertOne(artifact)
-        return result.insertedId != null
+        return result.insertedId?.asObjectId()?.value?.toString()
     }
 
     suspend fun deleteById(id: ObjectId): Boolean {
