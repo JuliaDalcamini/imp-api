@@ -27,8 +27,9 @@ class ArtifactRepository(private var database: MongoDatabase) {
         val query = Filters.eq("_id", id)
 
         val updates = Updates.combine(
-            Updates.set(Artifact::status.name, artifact.status),
-            Updates.set(Artifact::conclusionDateTime.name, artifact.conclusionDateTime)
+            Updates.set(Artifact::name.name, artifact.name),
+            Updates.set(Artifact::inspectors.name, artifact.inspectors),
+            Updates.set(Artifact::priority.name, artifact.priority)
         )
 
         val result = database.getCollection<Artifact>(COLLECTION).updateOne(query, updates)

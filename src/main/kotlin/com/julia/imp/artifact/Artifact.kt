@@ -11,7 +11,7 @@ data class Artifact(
     val name: String,
     val artifactType: String,
     val creatorId: String,
-    val status: Boolean,
+    val inspectors: List<String>,
     val creationDateTime: LocalDateTime,
     val conclusionDateTime: LocalDateTime?,
     val priority: Priority

@@ -1,4 +1,4 @@
-package com.julia.imp.artifact
+package com.julia.imp.artifact.create
 
 import kotlinx.serialization.Serializable
 

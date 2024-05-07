@@ -24,7 +24,7 @@ fun Route.loginRoute() {
             val token = JWT.create()
                 .withAudience(JwtParams.AUDIENCE)
                 .withIssuer(JwtParams.DOMAIN)
-                .withClaim("user.id", user.id.toString())
+                .withClaim("user", user.id.toString())
                 .withExpiresAt(Date(System.currentTimeMillis() + 60000))
                 .sign(Algorithm.HMAC256(JwtParams.SECRET))
 
