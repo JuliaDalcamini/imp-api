@@ -1,4 +1,4 @@
-package com.julia.imp.prioritizationMethod
+package com.julia.imp.priority
 
 class MoscowMethod : PrioritizationMethod {
 
