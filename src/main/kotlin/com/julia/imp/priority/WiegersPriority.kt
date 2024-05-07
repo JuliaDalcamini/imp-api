@@ -1,7 +1,12 @@
 package com.julia.imp.priority
 
-class WiegersMethod : PrioritizationMethod {
-    override fun prioritize(response: String?): String? {
-        TODO("Not yet implemented")
-    }
-}
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+@SerialName("wiegers")
+data class WiegersPriority(
+    val userValue: Int,
+    val complexity: Int,
+    val impact: Int
+) : Priority()

@@ -1,5 +1,6 @@
 package com.julia.imp.artifact
 
+import com.julia.imp.priority.Priority
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
@@ -13,5 +14,5 @@ data class Artifact(
     val status: Boolean,
     val creationDateTime: LocalDateTime,
     val conclusionDateTime: LocalDateTime?,
-    val priority: String
+    val priority: Priority
 )

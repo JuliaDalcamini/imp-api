@@ -2,6 +2,7 @@ package com.julia.imp.plugins
 
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.auth.user.UserRepository
+import com.julia.imp.project.ProjectRepository
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.ktor.server.application.*
@@ -18,6 +19,7 @@ fun Application.configureDependencyInjection() {
             module {
                 single<UserRepository> { UserRepository(get()) }
                 single<ArtifactRepository> { ArtifactRepository(get()) }
+                single<ProjectRepository> { ProjectRepository(get()) }
             }
         )
     }

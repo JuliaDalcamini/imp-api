@@ -42,6 +42,7 @@ dependencies {
 
     // MongoDB
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongo_driver_version")
+    implementation("org.mongodb:bson-kotlinx:$mongo_driver_version")
 
     // Koin Dependency Injection
     implementation("io.insert-koin:koin-ktor:$koin_version")

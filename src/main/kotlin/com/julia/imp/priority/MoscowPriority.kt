@@ -1,8 +1,10 @@
 package com.julia.imp.priority
 
-class MoscowMethod : PrioritizationMethod {
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-    override fun prioritize(response: String?): String? {
-        TODO("Not yet implemented")
-    }
-}
+@Serializable
+@SerialName("moscow")
+data class MoscowPriority(
+    val level: MoscowPriorityLevel
+) : Priority()

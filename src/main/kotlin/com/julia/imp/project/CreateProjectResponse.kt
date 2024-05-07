@@ -1,8 +1,8 @@
-package com.julia.imp.artifact
+package com.julia.imp.project
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateArtifactResponse(
-    val artifactId: String
+data class CreateProjectResponse(
+    val projectId: String
 )
