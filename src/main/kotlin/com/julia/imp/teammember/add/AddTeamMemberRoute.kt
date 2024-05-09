@@ -1,6 +1,5 @@
 package com.julia.imp.teammember.add
 
-import com.julia.imp.team.TeamRepository
 import com.julia.imp.teammember.TeamMember
 import com.julia.imp.teammember.TeamMemberRepository
 import io.ktor.http.HttpStatusCode
@@ -14,11 +13,10 @@ import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
 
 fun Route.addTeamMemberRoute() {
-    val repository by inject<TeamRepository>()
     val memberRepository by inject<TeamMemberRepository>()
 
     authenticate {
-        post("/team/member/add") {
+        post("/teams/members") {
             val request = call.receive<AddTeamMemberRequest>()
 
 

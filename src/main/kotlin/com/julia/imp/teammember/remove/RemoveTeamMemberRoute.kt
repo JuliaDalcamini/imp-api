@@ -1,6 +1,5 @@
-package com.julia.imp.team.delete
+package com.julia.imp.teammember.remove
 
-import com.julia.imp.team.TeamRepository
 import com.julia.imp.teammember.TeamMemberRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -14,33 +13,31 @@ import io.ktor.server.routing.delete
 import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
 
-fun Route.deleteTeamRoute() {
-    val repository by inject<TeamRepository>()
-    val memberRepository by inject<TeamMemberRepository>()
+fun Route.removeTeamMemberRoute() {
+    val repository by inject<TeamMemberRepository>()
 
     authenticate {
-        delete("/teams/{id}") {
-            val teamId = call.parameters["id"]
+        delete("/teams/members/{id}") {
+            val teamMemberId = call.parameters["id"]
             val userId = call.principal<JWTPrincipal>()!!.payload.getClaim("user.id").asString()
 
-            val team = repository.findById(ObjectId(teamId))
-                ?: throw NotFoundException("Team not found")
+            val teamMember = repository.findById(ObjectId(teamMemberId))
+                ?: throw NotFoundException("Member not found")
 
-            val user = memberRepository.findByUserIdAndTeamId(userId, team.id.toString())
+            val user = repository.findByUserIdAndTeamId(userId, teamMember.teamId)
 
             when {
                 user == null || !user.isAdmin -> call.respond(
                     HttpStatusCode.Unauthorized,
-                    "Only team admins can delete teams"
+                    "Only team admins can delete members"
                 )
 
                 else -> {
                     try {
-                        repository.deleteById(ObjectId(teamId))
-                        memberRepository.deleteByTeamId(ObjectId(teamId))
-                        call.respond(HttpStatusCode.OK, "Team deleted successfully")
+                        repository.deleteById(ObjectId(teamMemberId))
+                        call.respond(HttpStatusCode.OK, "Member deleted successfully")
                     } catch (error: Throwable) {
-                        call.respond(HttpStatusCode.InternalServerError, "Failed to delete team")
+                        call.respond(HttpStatusCode.InternalServerError, "Failed to delete member")
                     }
                 }
             }

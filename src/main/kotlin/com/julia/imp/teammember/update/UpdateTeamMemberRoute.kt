@@ -1,6 +1,5 @@
-package com.julia.imp.team.update
+package com.julia.imp.teammember.update
 
-import com.julia.imp.team.TeamRepository
 import com.julia.imp.teammember.TeamMemberRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -15,39 +14,38 @@ import io.ktor.server.routing.patch
 import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
 
-fun Route.updateTeamRoute() {
-    val repository by inject<TeamRepository>()
-    val memberRepository by inject<TeamMemberRepository>()
+fun Route.updateTeamMemberRoute() {
+    val repository by inject<TeamMemberRepository>()
 
     authenticate {
-        patch("/teams/{id}") {
-            val request = call.receive<UpdateTeamRequest>()
-            val teamId = call.parameters["id"]
+        patch("/teams/members/{id}") {
+            val request = call.receive<UpdateTeamMemberRequest>()
+            val teamMemberId = call.parameters["id"]
             val userId = call.principal<JWTPrincipal>()!!.payload.getClaim("user.id").asString()
 
-            val oldTeam = repository.findById(ObjectId(teamId))
-                ?: throw NotFoundException("Team not found")
+            val oldTeamMember = repository.findById(ObjectId(teamMemberId))
+                ?: throw NotFoundException("Member not found")
 
-            val user = memberRepository.findByUserIdAndTeamId(userId, oldTeam.id.toString())
+            val user = repository.findByUserIdAndTeamId(userId, oldTeamMember.teamId)
 
             when {
                 user == null || !user.isAdmin -> call.respond(
                     HttpStatusCode.Unauthorized,
-                    "Only team admins can update team name"
+                    "Only team admins can update role members"
                 )
 
                 else -> {
                     try {
                         repository.updateOne(
-                            id = oldTeam.id,
-                            team = oldTeam.copy(
-                                name = request.name
+                            id = oldTeamMember.id,
+                            teamMember = oldTeamMember.copy(
+                                role = request.role
                             )
                         )
 
                         call.respond(HttpStatusCode.OK)
                     } catch (e: Exception) {
-                        call.respond(HttpStatusCode.InternalServerError, "Failed to update team")
+                        call.respond(HttpStatusCode.InternalServerError, "Failed to update member")
                     }
                 }
             }

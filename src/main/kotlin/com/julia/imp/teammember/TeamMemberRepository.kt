@@ -34,9 +34,9 @@ class TeamMemberRepository(private var database: MongoDatabase) {
             )
             .firstOrNull()
 
-    suspend fun findByUserId(teamId: String): TeamMember? =
+    suspend fun findByUserId(userId: String): TeamMember? =
         database.getCollection<TeamMember>(COLLECTION)
-            .find(Filters.eq("teamId", teamId))
+            .find(Filters.eq("userId", userId))
             .firstOrNull()
 
     suspend fun updateOne(id: ObjectId, teamMember: TeamMember): Boolean {
