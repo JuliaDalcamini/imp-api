@@ -1,14 +1,14 @@
 package com.julia.imp.project
 
-import com.julia.imp.auth.user.User
 import com.julia.imp.priority.Prioritizer
-import com.julia.imp.team.Team
-import org.bson.codecs.pojo.annotations.BsonId
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
 
 data class Project(
-    @BsonId
+    @Contextual
+    @SerialName("_id")
     val id: ObjectId,
     val name: String,
     val creationDateTime: LocalDateTime,

@@ -1,11 +1,16 @@
 package com.julia.imp.teammember
 
-import org.bson.codecs.pojo.annotations.BsonId
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
 
+@Serializable
 data class TeamMember(
-    @BsonId
+    @Contextual
+    @SerialName("_id")
     val id: ObjectId,
+
     val userId: String,
     val teamId: String,
     val role: Role

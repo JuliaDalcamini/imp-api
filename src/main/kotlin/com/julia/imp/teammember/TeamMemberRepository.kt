@@ -12,7 +12,10 @@ class TeamMemberRepository(private var database: MongoDatabase) {
 
     suspend fun insertOne(teamMember: TeamMember): String {
         val existingMember = findByUserIdAndTeamId(teamMember.userId, teamMember.teamId)
-        if (existingMember != null) throw DuplicateItemError("Member already exists")
+
+        if (existingMember != null) {
+            throw DuplicateItemError("Member already exists")
+        }
 
         val result = database.getCollection<TeamMember>(COLLECTION).insertOne(teamMember)
 
