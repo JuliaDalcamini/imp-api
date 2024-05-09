@@ -1,8 +1,8 @@
-package com.julia.imp.team.create
+package com.julia.imp.team.update
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateTeamRequest(
+data class UpdateTeamRequest(
     val name: String
 )

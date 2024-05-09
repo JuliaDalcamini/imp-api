@@ -4,14 +4,15 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.julia.imp.auth.JwtParams
 import com.julia.imp.auth.user.UserRepository
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.server.application.call
+import io.ktor.server.auth.UnauthorizedResponse
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.post
 import org.koin.ktor.ext.inject
 import org.mindrot.jbcrypt.BCrypt
-import java.util.*
+import java.util.Date
 
 fun Route.loginRoute() {
     val repository by inject<UserRepository>()
@@ -24,7 +25,7 @@ fun Route.loginRoute() {
             val token = JWT.create()
                 .withAudience(JwtParams.AUDIENCE)
                 .withIssuer(JwtParams.DOMAIN)
-                .withClaim("user", user.id.toString())
+                .withClaim("user.id", user.id.toString())
                 .withExpiresAt(Date(System.currentTimeMillis() + 60000))
                 .sign(Algorithm.HMAC256(JwtParams.SECRET))
 

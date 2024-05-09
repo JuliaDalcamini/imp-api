@@ -1,4 +1,4 @@
-package com.julia.imp.team.member
+package com.julia.imp.teammember
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
