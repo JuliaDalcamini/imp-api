@@ -1,11 +1,11 @@
 package com.julia.imp.artifact
 
 import com.julia.imp.priority.Priority
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
-import java.time.LocalDateTime
 
 @Serializable
 data class Artifact(
@@ -13,10 +13,10 @@ data class Artifact(
     @SerialName("_id")
     val id: ObjectId,
     val name: String,
-    val artifactType: String,
+    val artifactTypeId: String,
+    val projectId: String,
     val creatorId: String,
-    val inspectors: List<String>,
-    @Contextual
-    val creationDateTime: LocalDateTime,
+    val inspectorIdList: List<String>,
+    val creationDateTime: Instant,
     val priority: Priority
 )

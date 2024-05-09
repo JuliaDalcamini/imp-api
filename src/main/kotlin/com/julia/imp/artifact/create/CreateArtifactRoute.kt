@@ -2,41 +2,43 @@ package com.julia.imp.artifact.create
 
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.post
+import kotlinx.datetime.Clock
 import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
-import java.time.LocalDateTime
 
 fun Route.createArtifactRoute() {
     val repository by inject<ArtifactRepository>()
 
     authenticate {
-        post("/artifact/create") {
+        post("/artifacts") {
             val request = call.receive<CreateArtifactRequest>()
             val userId = call.principal<JWTPrincipal>()!!.payload.getClaim("user.id").asString()
 
-            val id = repository.insertOne(
-                Artifact(
-                    id = ObjectId(),
-                    name = request.name,
-                    artifactType = request.artifactType,
-                    creatorId = userId,
-                    inspectors = listOf(),
-                    creationDateTime = LocalDateTime.now(),
-                    conclusionDateTime = null,
-                    priority = request.priority,
+            try {
+                val artifactId = repository.insertOne(
+                    Artifact(
+                        id = ObjectId(),
+                        name = request.name,
+                        artifactTypeId = request.artifactTypeId,
+                        projectId = request.projectId,
+                        creatorId = userId,
+                        inspectorIdList = request.inspectorIdList,
+                        creationDateTime = Clock.System.now(),
+                        priority = request.priority,
+                    )
                 )
-            )
 
-            if (id != null) {
-                call.respond(HttpStatusCode.Created, CreateArtifactResponse(id))
-            } else {
+                call.respond(HttpStatusCode.Created, CreateArtifactResponse(artifactId))
+            } catch (error: Throwable) {
                 call.respond(HttpStatusCode.InternalServerError)
             }
         }

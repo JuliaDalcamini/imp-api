@@ -1,21 +1,28 @@
 package com.julia.imp.artifact.delete
 
 import com.julia.imp.artifact.ArtifactRepository
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
+import io.ktor.server.auth.authenticate
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.delete
 import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
 
 fun Route.deleteArtifactRoute() {
     val repository by inject<ArtifactRepository>()
 
-    delete("/artifact/delete/{id}") {
-        val id = call.parameters["id"]
+    authenticate {
+        delete("/artifacts/{id}") {
+            val artifactId = call.parameters["id"]
 
-        repository.deleteById(ObjectId(id))
-
-        call.respond(HttpStatusCode.OK)
+            try {
+                repository.deleteById(ObjectId(artifactId))
+                call.respond(HttpStatusCode.OK, "Artifact deleted successfully")
+            } catch (error: Throwable) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to delete artifact")
+            }
+        }
     }
 }

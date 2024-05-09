@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UpdateArtifactRequest(
     val name: String,
-    val inspectors: List<String>,
+    val artifactTypeId: String,
+    val inspectorIdList: List<String>,
     val priority: Priority
 )

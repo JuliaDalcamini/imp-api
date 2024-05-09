@@ -46,7 +46,7 @@ fun Route.updateTeamRoute() {
                         )
 
                         call.respond(HttpStatusCode.OK)
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
                         call.respond(HttpStatusCode.InternalServerError, "Failed to update team")
                     }
                 }

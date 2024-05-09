@@ -5,6 +5,7 @@ val logback_version: String by project
 val mongo_driver_version: String by project
 val koin_version: String by project
 val jbcrypt_version: String by project
+val kotlinx_datetime_version: String by project
 
 plugins {
     kotlin("jvm") version "1.9.23"
@@ -49,6 +50,9 @@ dependencies {
 
     // BCrypt implementation
     implementation("org.mindrot:jbcrypt:$jbcrypt_version")
+
+    // KotlinX date time
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinx_datetime_version")
 
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")

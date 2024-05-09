@@ -3,14 +3,15 @@ package com.julia.imp.project
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.firstOrNull
 import org.bson.types.ObjectId
 
 class ProjectRepository(private var database: MongoDatabase) {
 
-    suspend fun insertOne(project: Project): String? {
+    suspend fun insertOne(project: Project): String {
         val result = database.getCollection<Project>(COLLECTION).insertOne(project)
-        return result.insertedId?.asObjectId()?.value?.toString()
+        return result.insertedId?.asObjectId()?.value?.toString() ?: throw IOException("Failed to create project")
     }
 
     suspend fun deleteById(id: ObjectId): Boolean {

@@ -19,7 +19,7 @@ class TeamMemberRepository(private var database: MongoDatabase) {
 
         val result = database.getCollection<TeamMember>(COLLECTION).insertOne(teamMember)
 
-        return result.insertedId?.asObjectId()?.value?.toString() ?: throw IOException("Failed to add team member")
+        return result.insertedId?.asObjectId()?.value?.toString() ?: throw IOException("Failed to add member")
     }
 
     suspend fun findById(objectId: ObjectId): TeamMember? =

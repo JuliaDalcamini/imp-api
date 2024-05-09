@@ -3,14 +3,15 @@ package com.julia.imp.artifact
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.firstOrNull
 import org.bson.types.ObjectId
 
 class ArtifactRepository(private var database: MongoDatabase) {
 
-    suspend fun insertOne(artifact: Artifact): String? {
+    suspend fun insertOne(artifact: Artifact): String {
         val result = database.getCollection<Artifact>(COLLECTION).insertOne(artifact)
-        return result.insertedId?.asObjectId()?.value?.toString()
+        return result.insertedId?.asObjectId()?.value?.toString() ?: throw IOException("Failed to add new artifact")
     }
 
     suspend fun deleteById(id: ObjectId): Boolean {
@@ -28,7 +29,7 @@ class ArtifactRepository(private var database: MongoDatabase) {
 
         val updates = Updates.combine(
             Updates.set(Artifact::name.name, artifact.name),
-            Updates.set(Artifact::inspectors.name, artifact.inspectors),
+            Updates.set(Artifact::inspectorIdList.name, artifact.inspectorIdList),
             Updates.set(Artifact::priority.name, artifact.priority)
         )
 

@@ -2,6 +2,7 @@ package com.julia.imp.project.create
 
 import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectRepository
+import com.julia.imp.teammember.TeamMemberRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
@@ -11,33 +12,48 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
-import io.ktor.utils.io.errors.IOException
+import kotlinx.datetime.Clock
 import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
-import java.time.LocalDateTime
 
 fun Route.createProjectRoute() {
     val repository by inject<ProjectRepository>()
+    val teamMemberRepository by inject<TeamMemberRepository>()
 
     authenticate {
-        post("/project/create") {
+        post("/projects") {
             val request = call.receive<CreateProjectRequest>()
             val userId = call.principal<JWTPrincipal>()!!.payload.getClaim("user.id").asString()
 
-            val id = repository.insertOne(
-                Project(
-                    id = ObjectId(),
-                    name = request.name,
-                    creationDateTime = LocalDateTime.now(),
-                    creatorId = userId,
-                    prioritizer = request.prioritizer,
+            val user = teamMemberRepository.findByUserIdAndTeamId(userId, request.teamId)
+
+            when {
+                user == null || !user.isAdmin -> call.respond(
+                    HttpStatusCode.Unauthorized,
+                    "Only team admins can add new projects"
+                )
+
+                else -> {
+                    try {
+                        val projectId = repository.insertOne(
+                            Project(
+                                id = ObjectId(),
+                                name = request.name,
+                                creationDateTime = Clock.System.now(),
+                                creatorId = userId,
+                                prioritizer = request.prioritizer,
 //                    checklist = null,
 //                    artifactsList = listOf(),
-                    teamId = request.teamId
-                )
-            ) ?: throw IOException("Failed to create project")
+                                teamId = request.teamId
+                            )
+                        )
 
-            call.respond(HttpStatusCode.Created, CreateProjectResponse(id))
+                        call.respond(HttpStatusCode.Created, CreateProjectResponse(projectId))
+                    } catch (error: Throwable) {
+                        call.respond(HttpStatusCode.InternalServerError)
+                    }
+                }
+            }
         }
     }
 }
