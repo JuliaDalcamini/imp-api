@@ -1,11 +1,17 @@
 package com.julia.imp.checklist
 
+import com.julia.imp.artifactType.ArtifactType
 import com.julia.imp.question.Question
-import org.bson.codecs.pojo.annotations.BsonId
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.bson.types.ObjectId
 
+@Serializable
 data class ChecklistTemplate(
-    @BsonId
-    val id: String,
-    val artifactTypes: ArrayList<String>,
-    val questions: ArrayList<Question>
-)
+    @Contextual
+    @SerialName("_id")
+    val id: ObjectId,
+    val artifactTypes: List<ArtifactType>,
+    val questions: List<Question>
+) : Checklist()

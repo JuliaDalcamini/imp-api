@@ -16,7 +16,7 @@ data class Artifact(
     val artifactTypeId: String,
     val projectId: String,
     val creatorId: String,
-    val inspectorIdList: List<String>,
+    val inspectorIds: List<String>,
     val creationDateTime: Instant,
     val priority: Priority
 )

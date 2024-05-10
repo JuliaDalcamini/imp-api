@@ -31,7 +31,7 @@ fun Route.createArtifactRoute() {
                         artifactTypeId = request.artifactTypeId,
                         projectId = request.projectId,
                         creatorId = userId,
-                        inspectorIdList = request.inspectorIdList,
+                        inspectorIds = request.inspectorIds,
                         creationDateTime = Clock.System.now(),
                         priority = request.priority,
                     )

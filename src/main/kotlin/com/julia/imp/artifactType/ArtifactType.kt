@@ -1,4 +1,4 @@
-package com.julia.imp.artifact
+package com.julia.imp.artifactType
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName

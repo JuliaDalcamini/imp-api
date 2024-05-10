@@ -8,6 +8,6 @@ data class CreateArtifactRequest(
     val name: String,
     val artifactTypeId: String,
     val projectId: String,
-    val inspectorIdList: List<String>,
+    val inspectorIds: List<String>,
     val priority: Priority
 )

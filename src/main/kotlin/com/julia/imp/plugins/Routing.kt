@@ -2,6 +2,7 @@ package com.julia.imp.plugins
 
 import com.julia.imp.artifact.artifactRoutes
 import com.julia.imp.auth.authRoutes
+import com.julia.imp.checklist.checklistRoutes
 import com.julia.imp.project.projectRoutes
 import com.julia.imp.team.teamRoutes
 import com.julia.imp.teammember.teamMemberRoutes
@@ -15,5 +16,6 @@ fun Application.configureRouting() {
         projectRoutes()
         teamRoutes()
         teamMemberRoutes()
+        checklistRoutes()
     }
 }

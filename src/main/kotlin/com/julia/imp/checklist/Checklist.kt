@@ -1,4 +1,6 @@
 package com.julia.imp.checklist
 
-interface Checklist {
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed class Checklist

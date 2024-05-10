@@ -29,7 +29,7 @@ fun Route.updateArtifactRoute() {
                     artifact = oldArtifact.copy(
                         name = request.name,
                         artifactTypeId = request.artifactTypeId,
-                        inspectorIdList = request.inspectorIdList,
+                        inspectorIds = request.inspectorIds,
                         priority = request.priority
                     )
                 )

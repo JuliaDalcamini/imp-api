@@ -1,15 +1,20 @@
 package com.julia.imp.question
 
-import org.bson.codecs.pojo.annotations.BsonId
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.bson.types.ObjectId
 
+@Serializable
 data class Question(
-    @BsonId
-    val id: String,
+    @Contextual
+    @SerialName("_id")
+    val id: ObjectId,
     val question: String,
     val artifactTypeId: String,
     val severity: String,
-    val answer: Answer,
+    val answer: Boolean,
     val quantity: Int,
-    val observation: String,
+    ///val observation: String,
     val defectTypeId: String
 )
