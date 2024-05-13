@@ -20,6 +20,8 @@ class QuestionRepository(private var database: MongoDatabase) {
         return result.deletedCount > 0
     }
 
+    suspend fun findAllQuestionsIds(): List<String> = findAllQuestions().map { it.id.toString() }
+
     suspend fun findAllQuestions(): List<Question> =
         database.getCollection<Question>(COLLECTION)
             .find()

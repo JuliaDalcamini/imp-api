@@ -36,6 +36,7 @@ fun Route.updateArtifactRoute() {
 
                 call.respond(HttpStatusCode.OK)
             } catch (error: Throwable) {
+                error.printStackTrace()
                 call.respond(HttpStatusCode.InternalServerError)
             }
         }

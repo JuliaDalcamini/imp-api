@@ -20,6 +20,8 @@ class ArtifactTypeRepository(private var database: MongoDatabase) {
         return result.deletedCount > 0
     }
 
+    suspend fun findAllArtifactTypesIds(): List<String> = findAllArtifactTypes().map { it.id.toString() }
+
     suspend fun findAllArtifactTypes(): List<ArtifactType> =
         database.getCollection<ArtifactType>(COLLECTION)
             .find().toList()

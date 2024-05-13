@@ -27,8 +27,8 @@ fun Route.createChecklistRoutes() {
                 repository.insertOne(
                     ChecklistTemplate(
                         id = ObjectId(),
-                        questions = questionRepository.findAllQuestions(),
-                        artifactTypes = artifactTypeRepository.findAllArtifactTypes()
+                        questions = questionRepository.findAllQuestionsIds(),
+                        artifactTypes = artifactTypeRepository.findAllArtifactTypesIds()
                     )
                 )
 

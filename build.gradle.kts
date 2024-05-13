@@ -6,11 +6,12 @@ val mongo_driver_version: String by project
 val koin_version: String by project
 val jbcrypt_version: String by project
 val kotlinx_datetime_version: String by project
+val kotlinx_serialization_version: String by project
 
 plugins {
-    kotlin("jvm") version "1.9.23"
-    id("io.ktor.plugin") version "2.3.9"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
+    kotlin("jvm") version "1.9.24"
+    kotlin("plugin.serialization") version "1.9.24"
+    id("io.ktor.plugin") version "2.3.11"
 }
 
 group = "com.julia.imp"
@@ -53,6 +54,7 @@ dependencies {
 
     // KotlinX date time
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinx_datetime_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_version")
 
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")

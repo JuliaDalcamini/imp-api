@@ -13,8 +13,8 @@ data class Question(
     val question: String,
     val artifactTypeId: String,
     val severity: String,
-    val answer: Boolean,
+    val answer: Answer?,
     val quantity: Int,
-    ///val observation: String,
+    val observation: String,
     val defectTypeId: String
 )
