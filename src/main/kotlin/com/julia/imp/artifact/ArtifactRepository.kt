@@ -1,5 +1,6 @@
 package com.julia.imp.artifact
 
+import com.julia.imp.priority.MoscowPriorityLevel
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
@@ -37,6 +38,16 @@ class ArtifactRepository(private var database: MongoDatabase) {
 
         return result.modifiedCount > 0
     }
+
+    suspend fun updatePriorityLevel(id: ObjectId, level: MoscowPriorityLevel): Boolean {
+        val query = Filters.eq("_id", id)
+        val update = Updates.set("priority.level", level)
+
+        val result = database.getCollection<Artifact>(COLLECTION).updateOne(query, update)
+
+        return result.modifiedCount > 0
+    }
+
 
     companion object {
         private const val COLLECTION = "artifacts"
