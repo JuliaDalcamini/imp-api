@@ -7,4 +7,5 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 class ProjectRepository(database: MongoDatabase) : CrudRepository<Project>() {
 
     override val collection: MongoCollection<Project> = database.getCollection("projects")
+
 }

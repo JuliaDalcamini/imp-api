@@ -1,16 +1,24 @@
 package com.julia.imp.artifact
 
 import com.julia.imp.common.db.error.ItemNotFoundException
+import com.julia.imp.common.networking.error.UnauthorizedError
+import com.julia.imp.project.ProjectRepository
+import com.julia.imp.team.member.Role
+import com.julia.imp.team.member.TeamMemberRepository
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import org.bson.types.ObjectId
 
 class ArtifactService(
-    private val repository: ArtifactRepository
+    private val repository: ArtifactRepository,
+    private val projectRepository: ProjectRepository,
+    private val teamMemberRepository: TeamMemberRepository
 ) {
 
     suspend fun create(request: CreateArtifactRequest, loggedUserId: String): String {
-        // TODO: Verificar role do usuário
+
+        if(!checkUserRole(loggedUserId, request.projectId))
+            throw UnauthorizedError("Only admin can add a artifact")
 
         return repository.insert(
             Artifact(
@@ -30,7 +38,9 @@ class ArtifactService(
         val oldArtifact = repository.findById(artifactId)
             ?: throw NotFoundException("Artifact not found")
 
-        // TODO: Verificar role do usuário
+        if(!checkUserRole(loggedUserId, oldArtifact.projectId))
+            throw UnauthorizedError("Only admin can update a artifact")
+
 
         repository.replaceById(
             id = oldArtifact.id.toString(),
@@ -43,12 +53,24 @@ class ArtifactService(
     }
 
     suspend fun delete(artifactId: String, loggedUserId: String) {
-        // TODO: Verificar role do usuário
+        //TODO get projectId
+        if(!checkUserRole(loggedUserId, artifactId))
+            throw UnauthorizedError("Only admin can delete a artifact")
 
         try {
             repository.deleteById(artifactId)
         } catch (error: ItemNotFoundException) {
             throw NotFoundException("Artifact not found")
         }
+    }
+
+    private suspend fun checkUserRole(loggedUserId: String, projectId: String): Boolean {
+        val project = projectRepository.findById(projectId)
+            ?: throw NotFoundException("Project not found")
+
+        val teamMember = teamMemberRepository.findByUserIdAndTeamId(loggedUserId, project.teamId)
+            ?: throw NotFoundException("Team member not found")
+
+        return teamMember.role == Role.Admin
     }
 }
