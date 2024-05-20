@@ -11,10 +11,12 @@ import io.ktor.server.routing.post
 import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
 
+// TODO: Remover caso os templates sejam fixos no BD (sem manipulação pelo usuário)
 fun Route.checklistRoutes() {
     createChecklistRoutes()
 }
 
+// TODO: Caso sejam manipulados, migrar lógica para service
 fun Route.createChecklistRoutes() {
     val repository by inject<ChecklistRepository>()
     val questionRepository by inject<QuestionRepository>()
@@ -24,11 +26,11 @@ fun Route.createChecklistRoutes() {
         post("/checklists") {
 
             try {
-                repository.insertOne(
+                repository.insert(
                     ChecklistTemplate(
                         id = ObjectId(),
-                        questions = questionRepository.findAllQuestionsIds(),
-                        artifactTypes = artifactTypeRepository.findAllArtifactTypesIds()
+                        questions = questionRepository.findAll().map { it.id.toString() },
+                        artifactTypes = artifactTypeRepository.findAll().map { it.id.toString() }
                     )
                 )
 

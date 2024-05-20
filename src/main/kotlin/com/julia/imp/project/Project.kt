@@ -4,8 +4,10 @@ import com.julia.imp.priority.Prioritizer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
 
+@Serializable
 data class Project(
     @Contextual
     @SerialName("_id")

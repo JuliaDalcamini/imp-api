@@ -1,13 +1,18 @@
 package com.julia.imp.plugins
 
 import com.julia.imp.artifact.ArtifactRepository
+import com.julia.imp.artifact.ArtifactService
 import com.julia.imp.artifactType.ArtifactTypeRepository
+import com.julia.imp.auth.AuthService
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.checklist.ChecklistRepository
 import com.julia.imp.project.ProjectRepository
+import com.julia.imp.project.ProjectService
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.TeamRepository
-import com.julia.imp.teammember.TeamMemberRepository
+import com.julia.imp.team.TeamService
+import com.julia.imp.team.member.TeamMemberRepository
+import com.julia.imp.team.member.TeamMemberService
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.ktor.server.application.Application
@@ -24,10 +29,15 @@ fun Application.configureDependencyInjection() {
             },
             module {
                 single<UserRepository> { UserRepository(get()) }
+                single<AuthService> { AuthService(get()) }
                 single<ArtifactRepository> { ArtifactRepository(get()) }
+                single<ArtifactService> { ArtifactService(get()) }
                 single<ProjectRepository> { ProjectRepository(get()) }
+                single<ProjectService> { ProjectService(get(), get(), get(), get()) }
                 single<TeamRepository> { TeamRepository(get()) }
+                single<TeamService> { TeamService(get(), get()) }
                 single<TeamMemberRepository> { TeamMemberRepository(get()) }
+                single<TeamMemberService> { TeamMemberService(get(), get()) }
                 single<QuestionRepository> { QuestionRepository(get()) }
                 single<ChecklistRepository> { ChecklistRepository(get()) }
                 single<ArtifactTypeRepository> { ArtifactTypeRepository(get()) }

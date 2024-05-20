@@ -5,4 +5,5 @@ object JwtParams {
     const val DOMAIN = "imp"
     const val REALM = "ktor sample app"
     const val SECRET = "secret"
+    const val USER_ID_CLAIM = "user.id"
 }

@@ -1,10 +1,23 @@
 package com.julia.imp.auth
 
-import com.julia.imp.auth.login.loginRoute
-import com.julia.imp.auth.register.registerRoute
-import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.post
+import org.koin.ktor.ext.inject
 
 fun Route.authRoutes() {
-    loginRoute()
-    registerRoute()
+    val service by inject<AuthService>()
+
+    post("/login") {
+        val token = service.login(request = call.receive<LoginRequest>())
+        call.respond(LoginResponse(token))
+    }
+
+    post("/register") {
+        service.register(request = call.receive<RegisterRequest>())
+        call.respond(HttpStatusCode.Created)
+    }
 }
