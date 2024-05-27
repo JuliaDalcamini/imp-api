@@ -6,6 +6,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 
 class TeamMemberRepository(database: MongoDatabase) : CrudRepository<TeamMember>() {
 
@@ -26,8 +27,17 @@ class TeamMemberRepository(database: MongoDatabase) : CrudRepository<TeamMember>
             .find(Filters.and(Filters.eq("userId", userId), Filters.eq("teamId", teamId)))
             .firstOrNull()
 
+    suspend fun findByUserId(userId: String): List<TeamMember> =
+        collection
+            .find(Filters.and(Filters.eq("userId", userId)))
+            .toList()
+
     suspend fun deleteByTeamId(id: String): Long {
         val result = collection.deleteMany(Filters.eq("teamId", id))
         return result.deletedCount
     }
+
+    suspend fun findTeamsByUserId(userId: String): List<String> =
+        findByUserId(userId).map { it.teamId }
+
 }

@@ -9,6 +9,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
 import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -19,6 +20,14 @@ fun Route.teamRoutes() {
 
     route("/teams") {
         authenticate {
+            get {
+                val teams = service.get(
+                    loggedUserId = call.authenticatedUserId
+                )
+
+                call.respond(teams)
+            }
+
             post {
                 val teamId = service.create(
                     request = call.receive<CreateTeamRequest>(),

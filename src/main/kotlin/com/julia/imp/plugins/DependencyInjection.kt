@@ -31,7 +31,7 @@ fun Application.configureDependencyInjection() {
                 single<UserRepository> { UserRepository(get()) }
                 single<AuthService> { AuthService(get()) }
                 single<ArtifactRepository> { ArtifactRepository(get()) }
-                single<ArtifactService> { ArtifactService(get()) }
+                single<ArtifactService> { ArtifactService(get(), get(), get()) }
                 single<ProjectRepository> { ProjectRepository(get()) }
                 single<ProjectService> { ProjectService(get(), get(), get(), get()) }
                 single<TeamRepository> { TeamRepository(get()) }

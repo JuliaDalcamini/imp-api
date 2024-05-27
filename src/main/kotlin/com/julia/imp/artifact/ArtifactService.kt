@@ -3,8 +3,8 @@ package com.julia.imp.artifact
 import com.julia.imp.common.db.error.ItemNotFoundException
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.project.ProjectRepository
-import com.julia.imp.team.member.Role
 import com.julia.imp.team.member.TeamMemberRepository
+import com.julia.imp.team.member.isAdmin
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import org.bson.types.ObjectId
@@ -17,7 +17,7 @@ class ArtifactService(
 
     suspend fun create(request: CreateArtifactRequest, loggedUserId: String): String {
 
-        if(!checkUserRole(loggedUserId, request.projectId))
+        if(!isUserAdmin(loggedUserId, request.projectId))
             throw UnauthorizedError("Only admin can add a artifact")
 
         return repository.insert(
@@ -38,9 +38,9 @@ class ArtifactService(
         val oldArtifact = repository.findById(artifactId)
             ?: throw NotFoundException("Artifact not found")
 
-        if(!checkUserRole(loggedUserId, oldArtifact.projectId))
+        if (!isUserAdmin(loggedUserId, oldArtifact.projectId)) {
             throw UnauthorizedError("Only admin can update a artifact")
-
+        }
 
         repository.replaceById(
             id = oldArtifact.id.toString(),
@@ -53,8 +53,10 @@ class ArtifactService(
     }
 
     suspend fun delete(artifactId: String, loggedUserId: String) {
-        //TODO get projectId
-        if(!checkUserRole(loggedUserId, artifactId))
+        val oldArtifact = repository.findById(artifactId)
+            ?: throw NotFoundException("Artifact not found")
+
+        if(!isUserAdmin(loggedUserId, oldArtifact.projectId))
             throw UnauthorizedError("Only admin can delete a artifact")
 
         try {
@@ -64,13 +66,8 @@ class ArtifactService(
         }
     }
 
-    private suspend fun checkUserRole(loggedUserId: String, projectId: String): Boolean {
-        val project = projectRepository.findById(projectId)
-            ?: throw NotFoundException("Project not found")
-
-        val teamMember = teamMemberRepository.findByUserIdAndTeamId(loggedUserId, project.teamId)
-            ?: throw NotFoundException("Team member not found")
-
-        return teamMember.role == Role.Admin
+    private suspend fun isUserAdmin(loggedUserId: String, projectId: String): Boolean {
+        val project = projectRepository.findById(projectId) ?: return false
+        return teamMemberRepository.isAdmin(loggedUserId, project.teamId)
     }
 }

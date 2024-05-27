@@ -7,7 +7,9 @@ import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
 
@@ -22,21 +24,26 @@ fun Route.createChecklistRoutes() {
     val questionRepository by inject<QuestionRepository>()
     val artifactTypeRepository by inject<ArtifactTypeRepository>()
 
-    authenticate {
-        post("/checklists") {
+    route("/checklists") {
+        authenticate {
+            get {
+                
+            }
 
-            try {
-                repository.insert(
-                    ChecklistTemplate(
-                        id = ObjectId(),
-                        questions = questionRepository.findAll().map { it.id.toString() },
-                        artifactTypes = artifactTypeRepository.findAll().map { it.id.toString() }
+            post {
+                try {
+                    repository.insert(
+                        ChecklistTemplate(
+                            id = ObjectId(),
+                            questions = questionRepository.findAll().map { it.id.toString() },
+                            artifactTypes = artifactTypeRepository.findAll().map { it.id.toString() }
+                        )
                     )
-                )
 
-                call.respond(HttpStatusCode.OK)
-            } catch (error: Throwable) {
-                call.respond(HttpStatusCode.InternalServerError, error)
+                    call.respond(HttpStatusCode.OK)
+                } catch (error: Throwable) {
+                    call.respond(HttpStatusCode.InternalServerError, error)
+                }
             }
         }
     }

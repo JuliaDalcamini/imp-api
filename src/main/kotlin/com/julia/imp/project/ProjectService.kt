@@ -5,6 +5,8 @@ import com.julia.imp.common.db.error.ItemNotFoundException
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.member.TeamMemberRepository
+import com.julia.imp.team.member.isAdmin
+import com.julia.imp.team.member.isMember
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import org.bson.types.ObjectId
@@ -20,8 +22,9 @@ class ProjectService(
         val project = repository.findById(projectId)
             ?: throw NotFoundException("Project not found")
 
-        teamMemberRepository.findByUserIdAndTeamId(loggedUserId, project.teamId)
-            ?: throw UnauthorizedError("Only team members can see its projects")
+        if (!teamMemberRepository.isMember(loggedUserId, project.teamId)) {
+            throw UnauthorizedError("Only team members can see its projects")
+        }
 
         val creator = userRepository.findById(project.creatorId)
             ?: throw NotFoundException("Project creator not found")
@@ -37,9 +40,7 @@ class ProjectService(
     }
 
     suspend fun create(request: CreateProjectRequest, loggedUserId: String): String {
-        val loggedMember = teamMemberRepository.findByUserIdAndTeamId(loggedUserId, request.teamId)
-
-        if (loggedMember == null || !loggedMember.isAdmin) {
+        if (!teamMemberRepository.isAdmin(loggedUserId, request.teamId)) {
             throw UnauthorizedError("Only team admins can add new projects")
         }
 
@@ -59,9 +60,7 @@ class ProjectService(
         val oldProject = repository.findById(projectId)
             ?: throw NotFoundException("Project not found")
 
-        val loggedMember = teamMemberRepository.findByUserIdAndTeamId(loggedUserId, oldProject.teamId)
-
-        if (loggedMember == null || !loggedMember.isAdmin) {
+        if (!teamMemberRepository.isAdmin(loggedUserId, oldProject.teamId)) {
             throw UnauthorizedError("Only team admins can update projects")
         }
 
@@ -78,9 +77,7 @@ class ProjectService(
         val project = repository.findById(projectId)
             ?: throw NotFoundException("Project not found")
 
-        val loggedMember = teamMemberRepository.findByUserIdAndTeamId(loggedUserId, project.teamId)
-
-        if (loggedMember == null || !loggedMember.isAdmin) {
+        if (!teamMemberRepository.isAdmin(loggedUserId, project.teamId)) {
             throw UnauthorizedError("Only team admins can delete projects")
         }
 

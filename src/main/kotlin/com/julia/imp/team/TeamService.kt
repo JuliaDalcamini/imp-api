@@ -5,13 +5,21 @@ import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.team.member.Role
 import com.julia.imp.team.member.TeamMember
 import com.julia.imp.team.member.TeamMemberRepository
+import com.julia.imp.team.member.isAdmin
 import io.ktor.server.plugins.NotFoundException
 import org.bson.types.ObjectId
 
 class TeamService(
     private val repository: TeamRepository,
-    private val memberRepository: TeamMemberRepository
+    private val teamMemberRepository: TeamMemberRepository
 ) {
+
+    suspend fun get(loggedUserId: String): List<TeamResponse> {
+        val teamIds = teamMemberRepository.findTeamsByUserId(loggedUserId)
+        val teams = teamIds.mapNotNull { repository.findById(it) }
+
+        return teams.map { TeamResponse.of(it) }
+    }
 
     suspend fun create(request: CreateTeamRequest, loggedUserId: String): String {
         val teamId = repository.insert(
@@ -22,7 +30,7 @@ class TeamService(
         )
 
         try {
-            memberRepository.insert(
+            teamMemberRepository.insert(
                 TeamMember(
                     id = ObjectId(),
                     userId = loggedUserId,
@@ -39,9 +47,8 @@ class TeamService(
     }
 
     suspend fun update(teamId: String, request: UpdateTeamRequest, loggedUserId: String) {
-        val loggedMember = memberRepository.findByUserIdAndTeamId(loggedUserId, teamId)
 
-        if (loggedMember == null || !loggedMember.isAdmin) {
+        if (!isUserAdmin(loggedUserId, teamId)) {
             throw UnauthorizedError("Teams can only be updated by their admins")
         }
 
@@ -53,15 +60,14 @@ class TeamService(
             item = oldTeam.copy(name = request.name)
         )
     }
-    
-    suspend fun delete(teamId: String, loggedUserId: String) {
-        val loggedMember = memberRepository.findByUserIdAndTeamId(loggedUserId, teamId)
 
-        if (loggedMember == null || !loggedMember.isAdmin) {
+    suspend fun delete(teamId: String, loggedUserId: String) {
+
+        if (!isUserAdmin(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team admins can delete teams")
         }
 
-        memberRepository.deleteByTeamId(teamId)
+        teamMemberRepository.deleteByTeamId(teamId)
 
         try {
             repository.deleteById(teamId)
@@ -69,4 +75,9 @@ class TeamService(
             throw NotFoundException("Team not found")
         }
     }
+
+    private suspend fun isUserAdmin(loggedUserId: String, teamId: String): Boolean {
+        return teamMemberRepository.isAdmin(loggedUserId, teamId)
+    }
+
 }

@@ -14,9 +14,7 @@ class TeamMemberService(
 ) {
 
     suspend fun add(teamId: String, request: AddTeamMemberRequest, loggedUserId: String): String {
-        val loggedMember = repository.findByUserIdAndTeamId(loggedUserId, teamId)
-
-        if (loggedMember == null || !loggedMember.isAdmin) {
+        if (!isUserAdmin(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team admins can add new team members")
         }
 
@@ -38,9 +36,7 @@ class TeamMemberService(
     }
 
     suspend fun update(teamId: String, memberId: String, request: UpdateTeamMemberRequest, loggedUserId: String) {
-        val loggedMember = repository.findByUserIdAndTeamId(loggedUserId, teamId)
-
-        if (loggedMember == null || !loggedMember.isAdmin) {
+        if (!isUserAdmin(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team admins can update team members")
         }
 
@@ -57,9 +53,7 @@ class TeamMemberService(
     }
 
     suspend fun remove(teamId: String, memberId: String, loggedUserId: String) {
-        val loggedMember = repository.findByUserIdAndTeamId(loggedUserId, teamId)
-
-        if (loggedMember == null || !loggedMember.isAdmin) {
+        if (!isUserAdmin(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team admins can update team members")
         }
 
@@ -68,5 +62,9 @@ class TeamMemberService(
         } catch (error: ItemNotFoundException) {
             throw NotFoundException("Team member not found")
         }
+    }
+
+    private suspend fun isUserAdmin(loggedUserId: String, teamId: String): Boolean {
+        return repository.isAdmin(loggedUserId, teamId)
     }
 }
