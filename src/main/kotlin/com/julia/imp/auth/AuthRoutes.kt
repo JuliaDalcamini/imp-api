@@ -1,5 +1,6 @@
 package com.julia.imp.auth
 
+import com.julia.imp.auth.refresh.RefreshTokensRequest
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.request.receive
@@ -12,8 +13,13 @@ fun Route.authRoutes() {
     val service by inject<AuthService>()
 
     post("/login") {
-        val token = service.login(request = call.receive<LoginRequest>())
-        call.respond(LoginResponse(token))
+        val tokens = service.login(request = call.receive<LoginRequest>())
+        call.respond(tokens)
+    }
+
+    post("/refresh_tokens") {
+        val tokens = service.refreshTokens(request = call.receive<RefreshTokensRequest>())
+        call.respond(tokens)
     }
 
     post("/register") {

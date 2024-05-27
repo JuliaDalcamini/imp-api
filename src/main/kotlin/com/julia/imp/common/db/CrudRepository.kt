@@ -17,14 +17,16 @@ abstract class CrudRepository<T : Any> {
         return result.insertedId?.asObjectId()?.value?.toString() ?: throw IOException("Failed to insert item")
     }
 
-    open suspend fun findById(id: String): T? =
-        collection.find(Filters.eq("_id", ObjectId(id))).firstOrNull()
+    open suspend fun findById(id: ObjectId): T? =
+        collection.find(Filters.eq("_id", id)).firstOrNull()
+
+    suspend fun findById(id: String): T? = findById(ObjectId(id))
 
     open suspend fun findAll(): List<T> =
         collection.find().toList()
 
-    open suspend fun replaceById(id: String, item: T) {
-        val query = Filters.eq("_id", ObjectId(id))
+    open suspend fun replaceById(id: ObjectId, item: T) {
+        val query = Filters.eq("_id", id)
         val result = collection.replaceOne(query, item)
 
         if (result.modifiedCount < 1) {
@@ -32,11 +34,19 @@ abstract class CrudRepository<T : Any> {
         }
     }
 
-    open suspend fun deleteById(id: String) {
-        val result = collection.deleteOne(Filters.eq("_id", ObjectId(id)))
+    suspend fun replaceById(id: String, item: T) {
+        replaceById(ObjectId(id), item)
+    }
+
+    open suspend fun deleteById(id: ObjectId) {
+        val result = collection.deleteOne(Filters.eq("_id", id))
 
         if (result.deletedCount < 1) {
             throw ItemNotFoundException()
         }
+    }
+
+    suspend fun deleteById(id: String) {
+        deleteById(ObjectId(id))
     }
 }

@@ -4,6 +4,7 @@ import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.artifact.ArtifactService
 import com.julia.imp.artifactType.ArtifactTypeRepository
 import com.julia.imp.auth.AuthService
+import com.julia.imp.auth.refresh.RefreshTokenRepository
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.checklist.ChecklistRepository
 import com.julia.imp.project.ProjectRepository
@@ -29,7 +30,8 @@ fun Application.configureDependencyInjection() {
             },
             module {
                 single<UserRepository> { UserRepository(get()) }
-                single<AuthService> { AuthService(get()) }
+                single<RefreshTokenRepository> { RefreshTokenRepository(get()) }
+                single<AuthService> { AuthService(get(), get()) }
                 single<ArtifactRepository> { ArtifactRepository(get()) }
                 single<ArtifactService> { ArtifactService(get(), get(), get()) }
                 single<ProjectRepository> { ProjectRepository(get()) }
