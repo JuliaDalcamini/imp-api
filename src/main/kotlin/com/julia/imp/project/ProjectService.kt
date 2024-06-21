@@ -18,6 +18,28 @@ class ProjectService(
     private val teamRepository: TeamRepository
 ) {
 
+    suspend fun getAll(teamId: String, loggedUserId: String): List<ProjectResponse> {
+        if (!teamMemberRepository.isMember(loggedUserId, teamId)) {
+            throw UnauthorizedError("Only team members can see its projects")
+        }
+
+        val team = teamRepository.findById(teamId)
+            ?: throw NotFoundException("Team not found")
+
+        val projects = repository.findByTeamId(teamId)
+
+        return projects.map { project ->
+            val creator = userRepository.findById(project.creatorId)
+                ?: throw NotFoundException("Project creator not found")
+
+            ProjectResponse.of(
+                project = project,
+                creator = creator,
+                team = team
+            )
+        }
+    }
+
     suspend fun get(projectId: String, loggedUserId: String): ProjectResponse {
         val project = repository.findById(projectId)
             ?: throw NotFoundException("Project not found")

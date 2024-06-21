@@ -21,7 +21,7 @@ fun Route.teamMemberRoutes() {
         authenticate {
             post {
                 val newMemberId = service.add(
-                    teamId = call.parameters["teamId"] ?: throw BadRequestException("Team ID must be provided"),
+                    teamId = call.parameters["teamId"] ?: throw BadRequestException("Missing team ID"),
                     request = call.receive<AddTeamMemberRequest>(),
                     loggedUserId = call.authenticatedUserId
                 )
@@ -31,8 +31,8 @@ fun Route.teamMemberRoutes() {
 
             patch("{id}") {
                 service.update(
-                    teamId = call.parameters["teamId"] ?: throw BadRequestException("Team ID must be provided"),
-                    memberId = call.parameters["id"] ?: throw BadRequestException("Team member ID must be provided"),
+                    teamId = call.parameters["teamId"] ?: throw BadRequestException("Missing team ID"),
+                    memberId = call.parameters["id"] ?: throw BadRequestException("Missing team member ID"),
                     request = call.receive<UpdateTeamMemberRequest>(),
                     loggedUserId = call.authenticatedUserId
                 )
@@ -42,8 +42,8 @@ fun Route.teamMemberRoutes() {
 
             delete("{id}") {
                 service.remove(
-                    teamId = call.parameters["teamId"] ?: throw BadRequestException("Team ID must be provided"),
-                    memberId = call.parameters["id"] ?: throw BadRequestException("Team member ID must be provided"),
+                    teamId = call.parameters["teamId"] ?: throw BadRequestException("Missing team ID"),
+                    memberId = call.parameters["id"] ?: throw BadRequestException("Missing team member ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 

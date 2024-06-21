@@ -39,7 +39,7 @@ fun Route.teamRoutes() {
 
             patch("{id}") {
                 service.update(
-                    teamId = call.parameters["id"] ?: throw BadRequestException("Team ID must be provided"),
+                    teamId = call.parameters["id"] ?: throw BadRequestException("Missing team ID"),
                     request = call.receive<UpdateTeamRequest>(),
                     loggedUserId = call.authenticatedUserId
                 )
@@ -49,7 +49,7 @@ fun Route.teamRoutes() {
 
             delete("{id}") {
                 service.delete(
-                    teamId = call.parameters["id"] ?: throw BadRequestException("Team ID must be provided"),
+                    teamId = call.parameters["id"] ?: throw BadRequestException("Missing team ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 

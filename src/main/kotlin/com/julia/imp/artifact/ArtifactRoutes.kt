@@ -30,7 +30,7 @@ fun Route.artifactRoutes() {
 
             patch("{id}") {
                 service.update(
-                    artifactId = call.parameters["id"] ?: throw BadRequestException("Artifact ID must be provided"),
+                    artifactId = call.parameters["id"] ?: throw BadRequestException("Missing artifact ID"),
                     request = call.receive<UpdateArtifactRequest>(),
                     loggedUserId = call.authenticatedUserId
                 )
@@ -40,7 +40,7 @@ fun Route.artifactRoutes() {
 
             delete("{id}") {
                 service.delete(
-                    artifactId = call.parameters["id"] ?: throw BadRequestException("Artifact ID must be provided"),
+                    artifactId = call.parameters["id"] ?: throw BadRequestException("Missing artifact ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 

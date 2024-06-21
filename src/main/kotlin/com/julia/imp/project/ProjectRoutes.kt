@@ -20,9 +20,18 @@ fun Route.projectRoutes() {
 
     route("/projects") {
         authenticate {
+            get {
+                val projects = service.getAll(
+                    teamId = call.request.queryParameters["teamId"] ?: throw BadRequestException("Missing team ID"),
+                    loggedUserId = call.authenticatedUserId
+                )
+
+                call.respond(projects)
+            }
+
             get("{id}") {
                 val project = service.get(
-                    projectId = call.parameters["id"] ?: throw BadRequestException("Project ID must be provided"),
+                    projectId = call.parameters["id"] ?: throw BadRequestException("Missing project ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 
@@ -40,7 +49,7 @@ fun Route.projectRoutes() {
 
             patch("{id}") {
                 service.update(
-                    projectId = call.parameters["id"] ?: throw BadRequestException("Project ID must be provided"),
+                    projectId = call.parameters["id"] ?: throw BadRequestException("Missing project ID"),
                     request = call.receive<UpdateProjectRequest>(),
                     loggedUserId = call.authenticatedUserId
                 )
@@ -50,7 +59,7 @@ fun Route.projectRoutes() {
 
             delete("{id}") {
                 service.delete(
-                    projectId = call.parameters["id"] ?: throw BadRequestException("Project ID must be provided"),
+                    projectId = call.parameters["id"] ?: throw BadRequestException("Missing project ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 
