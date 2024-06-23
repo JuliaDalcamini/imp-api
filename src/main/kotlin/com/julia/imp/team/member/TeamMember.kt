@@ -14,6 +14,4 @@ data class TeamMember(
     val userId: String,
     val teamId: String,
     val role: Role
-) {
-    val isAdmin: Boolean by lazy { this.role == Role.Admin }
-}
+)
