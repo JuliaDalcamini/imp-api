@@ -13,8 +13,8 @@ fun Route.authRoutes() {
     val service by inject<AuthService>()
 
     post("/login") {
-        val tokens = service.login(request = call.receive<LoginRequest>())
-        call.respond(tokens)
+        val response = service.login(request = call.receive<LoginRequest>())
+        call.respond(response)
     }
 
     post("/refresh_tokens") {

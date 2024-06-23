@@ -21,11 +21,14 @@ class AuthService(
     private val refreshTokenRepository: RefreshTokenRepository
 ) {
 
-    suspend fun login(request: LoginRequest): TokenPair {
+    suspend fun login(request: LoginRequest): LoginResponse {
         val user = userRepository.findByEmail(request.email)
 
         if (user != null && BCrypt.checkpw(request.password, user.password)) {
-            return generateTokenPair(user.id.toString())
+            return LoginResponse(
+                userId = user.id.toString(),
+                tokens = generateTokenPair(user.id.toString())
+            )
         } else {
             throw UnauthorizedError("Unable to authenticate")
         }
