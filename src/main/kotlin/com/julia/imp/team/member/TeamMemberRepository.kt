@@ -37,6 +37,11 @@ class TeamMemberRepository(database: MongoDatabase) : CrudRepository<TeamMember>
         return result.deletedCount
     }
 
+    suspend fun deleteByUserIdAndTeamId(userId: String, teamId: String): Long {
+        val result = collection.deleteMany(Filters.and(Filters.eq("userId", userId), Filters.eq("teamId", teamId)))
+        return result.deletedCount
+    }
+
     suspend fun findTeamsByUserId(userId: String): List<String> =
         findByUserId(userId).map { it.teamId }
 

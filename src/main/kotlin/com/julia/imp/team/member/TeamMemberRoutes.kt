@@ -9,6 +9,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
 import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -19,6 +20,14 @@ fun Route.teamMemberRoutes() {
 
     route("/teams/{teamId}/members") {
         authenticate {
+            get("{userId}") {
+                service.get(
+                    teamId = call.parameters["teamId"] ?: throw BadRequestException("Missing team ID"),
+                    userId = call.parameters["userId"] ?: throw BadRequestException("Missing team member user ID"),
+                    loggedUserId = call.authenticatedUserId
+                )
+            }
+
             post {
                 val newMemberId = service.add(
                     teamId = call.parameters["teamId"] ?: throw BadRequestException("Missing team ID"),
@@ -29,10 +38,10 @@ fun Route.teamMemberRoutes() {
                 call.respond(HttpStatusCode.Created, AddTeamMemberResponse(newMemberId))
             }
 
-            patch("{id}") {
+            patch("{userId}") {
                 service.update(
                     teamId = call.parameters["teamId"] ?: throw BadRequestException("Missing team ID"),
-                    memberId = call.parameters["id"] ?: throw BadRequestException("Missing team member ID"),
+                    userId = call.parameters["userId"] ?: throw BadRequestException("Missing team member user ID"),
                     request = call.receive<UpdateTeamMemberRequest>(),
                     loggedUserId = call.authenticatedUserId
                 )
@@ -40,10 +49,10 @@ fun Route.teamMemberRoutes() {
                 call.respond(HttpStatusCode.NoContent)
             }
 
-            delete("{id}") {
+            delete("{userId}") {
                 service.remove(
                     teamId = call.parameters["teamId"] ?: throw BadRequestException("Missing team ID"),
-                    memberId = call.parameters["id"] ?: throw BadRequestException("Missing team member ID"),
+                    userId = call.parameters["userId"] ?: throw BadRequestException("Missing team member user ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 

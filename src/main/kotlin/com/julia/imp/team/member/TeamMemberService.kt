@@ -13,8 +13,19 @@ class TeamMemberService(
     private val userRepository: UserRepository
 ) {
 
+    suspend fun get(teamId: String, userId: String, loggedUserId: String): TeamMemberResponse {
+        if (!repository.isMember(loggedUserId, teamId)) {
+            throw UnauthorizedError("Only team members can see other team members")
+        }
+
+        val teamMember = repository.findByUserIdAndTeamId(userId, teamId)
+            ?: throw NotFoundException("Member not found")
+
+        return TeamMemberResponse.of(teamMember)
+    }
+
     suspend fun add(teamId: String, request: AddTeamMemberRequest, loggedUserId: String): String {
-        if (!isUserAdmin(loggedUserId, teamId)) {
+        if (!repository.isAdmin(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team admins can add new team members")
         }
 
@@ -35,16 +46,13 @@ class TeamMemberService(
         }
     }
 
-    suspend fun update(teamId: String, memberId: String, request: UpdateTeamMemberRequest, loggedUserId: String) {
-        if (!isUserAdmin(loggedUserId, teamId)) {
+    suspend fun update(teamId: String, userId: String, request: UpdateTeamMemberRequest, loggedUserId: String) {
+        if (!repository.isAdmin(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team admins can update team members")
         }
 
-        val oldTeamMember = repository.findById(memberId)
-
-        if (oldTeamMember == null || oldTeamMember.teamId != teamId) {
-            throw NotFoundException("Member not found")
-        }
+        val oldTeamMember = repository.findByUserIdAndTeamId(userId, teamId)
+            ?: throw NotFoundException("Member not found")
 
         repository.replaceById(
             id = oldTeamMember.id.toString(),
@@ -52,19 +60,15 @@ class TeamMemberService(
         )
     }
 
-    suspend fun remove(teamId: String, memberId: String, loggedUserId: String) {
-        if (!isUserAdmin(loggedUserId, teamId)) {
+    suspend fun remove(teamId: String, userId: String, loggedUserId: String) {
+        if (!repository.isAdmin(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team admins can update team members")
         }
 
         try {
-            repository.deleteById(memberId)
+            repository.deleteByUserIdAndTeamId(userId, teamId)
         } catch (error: ItemNotFoundException) {
             throw NotFoundException("Team member not found")
         }
-    }
-
-    private suspend fun isUserAdmin(loggedUserId: String, teamId: String): Boolean {
-        return repository.isAdmin(loggedUserId, teamId)
     }
 }
