@@ -88,10 +88,7 @@ class ProjectService(
 
         repository.replaceById(
             id = oldProject.id.toString(),
-            item = oldProject.copy(
-                name = request.name,
-                prioritizer = request.prioritizer
-            )
+            item = oldProject.copy(name = request.name)
         )
     }
 
