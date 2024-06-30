@@ -7,6 +7,9 @@ import com.julia.imp.auth.AuthService
 import com.julia.imp.auth.refresh.RefreshTokenRepository
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.checklist.ChecklistRepository
+import com.julia.imp.inspection.InspectionRepository
+import com.julia.imp.inspection.InspectionService
+import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.project.ProjectService
 import com.julia.imp.question.QuestionRepository
@@ -43,6 +46,9 @@ fun Application.configureDependencyInjection() {
                 single<QuestionRepository> { QuestionRepository(get()) }
                 single<ChecklistRepository> { ChecklistRepository(get()) }
                 single<ArtifactTypeRepository> { ArtifactTypeRepository(get()) }
+                single<InspectionRepository> { InspectionRepository(get()) }
+                single<InspectionService> { InspectionService(get(), get(), get(), get(), get(), get()) }
+                single<InspectionAnswerRepository> { InspectionAnswerRepository(get()) }
             }
         )
     }

@@ -19,7 +19,8 @@ data class ProjectResponse(
     @Serializable
     data class ProjectCreator(
         val id: String,
-        val name: String
+        val firstName: String,
+        val lastName: String
     )
 
     @Serializable
@@ -36,7 +37,8 @@ data class ProjectResponse(
             creationDateTime = project.creationDateTime,
             creator = ProjectCreator(
                 id = creator.id.toString(),
-                name = creator.firstName
+                firstName = creator.firstName,
+                lastName = creator.lastName
             ),
             prioritizer = project.prioritizer,
             team = ProjectTeam(

@@ -1,11 +1,11 @@
 package com.julia.imp.inspection
 
-import com.julia.imp.question.Question
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
+import kotlin.time.Duration
 
 @Serializable
 data class Inspection(
@@ -13,8 +13,7 @@ data class Inspection(
     @SerialName("_id")
     val id: ObjectId,
     val artifactId: String,
-    val inspector: String,
-    val start: Instant,
-    val end: Instant,
-    val questions: List<Question>
+    val inspectorId: String,
+    val duration: Duration,
+    val lastUpdate: Instant
 )
