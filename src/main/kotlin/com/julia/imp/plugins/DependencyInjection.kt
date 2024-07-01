@@ -36,7 +36,7 @@ fun Application.configureDependencyInjection() {
                 single<RefreshTokenRepository> { RefreshTokenRepository(get()) }
                 single<AuthService> { AuthService(get(), get()) }
                 single<ArtifactRepository> { ArtifactRepository(get()) }
-                single<ArtifactService> { ArtifactService(get(), get(), get()) }
+                single<ArtifactService> { ArtifactService(get(), get(), get(), get()) }
                 single<ProjectRepository> { ProjectRepository(get()) }
                 single<ProjectService> { ProjectService(get(), get(), get(), get()) }
                 single<TeamRepository> { TeamRepository(get()) }

@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 data class CreateArtifactRequest(
     val name: String,
     val artifactTypeId: String,
-    val projectId: String,
     val inspectorIds: List<String>,
     val priority: Priority
 )
