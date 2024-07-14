@@ -11,7 +11,7 @@ import org.bson.types.ObjectId
 data class Project(
     @Contextual
     @SerialName("_id")
-    val id: ObjectId,
+    val id: ObjectId = ObjectId(),
     val name: String,
     val creationDateTime: Instant,
     val creatorId: String,

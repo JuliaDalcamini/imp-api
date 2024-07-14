@@ -9,8 +9,7 @@ import org.bson.types.ObjectId
 data class TeamMember(
     @Contextual
     @SerialName("_id")
-    val id: ObjectId,
-
+    val id: ObjectId = ObjectId(),
     val userId: String,
     val teamId: String,
     val role: Role

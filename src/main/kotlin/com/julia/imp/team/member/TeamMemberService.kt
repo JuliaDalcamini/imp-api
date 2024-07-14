@@ -6,7 +6,6 @@ import com.julia.imp.common.db.error.ItemNotFoundException
 import com.julia.imp.common.networking.error.ConflictError
 import com.julia.imp.common.networking.error.UnauthorizedError
 import io.ktor.server.plugins.NotFoundException
-import org.bson.types.ObjectId
 
 class TeamMemberService(
     private val repository: TeamMemberRepository,
@@ -35,7 +34,6 @@ class TeamMemberService(
         try {
             return repository.insert(
                 TeamMember(
-                    id = ObjectId(),
                     userId = userToAdd.id.toString(),
                     teamId = teamId,
                     role = request.role

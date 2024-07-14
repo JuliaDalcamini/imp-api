@@ -9,7 +9,6 @@ import com.julia.imp.team.member.isAdmin
 import com.julia.imp.team.member.isMember
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
-import org.bson.types.ObjectId
 
 class ProjectService(
     private val repository: ProjectRepository,
@@ -68,7 +67,6 @@ class ProjectService(
 
         return repository.insert(
             Project(
-                id = ObjectId(),
                 name = request.name,
                 creationDateTime = Clock.System.now(),
                 creatorId = loggedUserId,

@@ -17,6 +17,11 @@ abstract class CrudRepository<T : Any> {
         return result.insertedId?.asObjectId()?.value?.toString() ?: throw IOException("Failed to insert item")
     }
 
+    open suspend fun insertAndGet(item: T): T {
+        val id = insert(item)
+        return findById(id) ?: throw IOException("Failed to get inserted item")
+    }
+
     open suspend fun findById(id: ObjectId): T? =
         collection.find(Filters.eq("_id", id)).firstOrNull()
 

@@ -9,7 +9,6 @@ import com.julia.imp.project.ProjectRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isMember
 import io.ktor.server.plugins.NotFoundException
-import org.bson.types.ObjectId
 
 class InspectionService(
     private val repository: InspectionRepository,
@@ -28,7 +27,6 @@ class InspectionService(
 
         val inspectionId = repository.insert(
             Inspection(
-                id = ObjectId(),
                 artifactId = artifactId,
                 inspectorId = loggedUserId,
                 duration = request.duration,
@@ -39,7 +37,6 @@ class InspectionService(
         for (pair in request.answers.entries) {
             answerRepository.insert(
                 InspectionAnswer(
-                    id = ObjectId(),
                     inspectionId = inspectionId,
                     questionId = pair.key,
                     answer = pair.value

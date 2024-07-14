@@ -9,7 +9,7 @@ import org.bson.types.ObjectId
 data class User(
     @Contextual
     @SerialName("_id")
-    val id: ObjectId,
+    val id: ObjectId = ObjectId(),
     val firstName: String,
     val lastName: String,
     val email: String,

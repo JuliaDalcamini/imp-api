@@ -9,7 +9,7 @@ import org.bson.types.ObjectId
 data class Question(
     @Contextual
     @SerialName("_id")
-    val id: ObjectId,
+    val id: ObjectId = ObjectId(),
     val question: String,
     val artifactTypeId: String,
     val severity: String,

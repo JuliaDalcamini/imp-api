@@ -7,7 +7,6 @@ import com.julia.imp.team.member.TeamMember
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isAdmin
 import io.ktor.server.plugins.NotFoundException
-import org.bson.types.ObjectId
 
 class TeamService(
     private val repository: TeamRepository,
@@ -21,27 +20,21 @@ class TeamService(
         return teams.map { TeamResponse.of(it) }
     }
 
-    suspend fun create(request: CreateTeamRequest, loggedUserId: String): String {
-        val teamId = repository.insert(
-            Team(
-                id = ObjectId(),
-                name = request.name
-            )
-        )
+    suspend fun create(request: CreateTeamRequest, loggedUserId: String): TeamResponse {
+        val team = repository.insertAndGet(Team(name = request.name))
 
         try {
             teamMemberRepository.insert(
                 TeamMember(
-                    id = ObjectId(),
                     userId = loggedUserId,
-                    teamId = teamId,
+                    teamId = team.id.toString(),
                     role = Role.Admin
                 )
             )
 
-            return teamId
+            return TeamResponse.of(team)
         } catch (error: Throwable) {
-            repository.deleteById(teamId)
+            repository.deleteById(team.id)
             throw error
         }
     }

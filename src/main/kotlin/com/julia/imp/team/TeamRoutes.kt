@@ -29,12 +29,12 @@ fun Route.teamRoutes() {
             }
 
             post {
-                val teamId = service.create(
+                val team = service.create(
                     request = call.receive<CreateTeamRequest>(),
                     loggedUserId = call.authenticatedUserId
                 )
 
-                call.respond(HttpStatusCode.Created, CreateTeamResponse(teamId))
+                call.respond(HttpStatusCode.Created, team)
             }
 
             patch("{id}") {

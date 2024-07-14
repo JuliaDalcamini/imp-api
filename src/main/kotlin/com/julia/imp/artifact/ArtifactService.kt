@@ -9,7 +9,6 @@ import com.julia.imp.team.member.isAdmin
 import com.julia.imp.team.member.isMember
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
-import org.bson.types.ObjectId
 
 class ArtifactService(
     private val repository: ArtifactRepository,
@@ -43,7 +42,6 @@ class ArtifactService(
 
         return repository.insert(
             Artifact(
-                id = ObjectId(),
                 name = request.name,
                 artifactTypeId = request.artifactTypeId,
                 projectId = projectId,

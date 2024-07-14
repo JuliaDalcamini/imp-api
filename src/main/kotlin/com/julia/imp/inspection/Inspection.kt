@@ -11,7 +11,7 @@ import kotlin.time.Duration
 data class Inspection(
     @Contextual
     @SerialName("_id")
-    val id: ObjectId,
+    val id: ObjectId = ObjectId(),
     val artifactId: String,
     val inspectorId: String,
     val duration: Duration,

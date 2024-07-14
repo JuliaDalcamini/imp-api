@@ -11,7 +11,7 @@ import org.bson.types.ObjectId
 data class EmptyChecklist (
     @Contextual
     @SerialName("_id")
-    val id: ObjectId,
+    val id: ObjectId = ObjectId(),
     val creatorId: String,
     val artifactTypes: List<ArtifactType>,
     val questions: List<Question>

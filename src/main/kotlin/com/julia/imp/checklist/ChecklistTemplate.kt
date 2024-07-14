@@ -9,7 +9,7 @@ import org.bson.types.ObjectId
 data class ChecklistTemplate(
     @Contextual
     @SerialName("_id")
-    val id: ObjectId,
+    val id: ObjectId = ObjectId(),
     val artifactTypes: List<String>,
     val questions: List<String>
 ) : Checklist()

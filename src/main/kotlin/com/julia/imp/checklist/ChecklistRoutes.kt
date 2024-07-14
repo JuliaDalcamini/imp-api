@@ -10,7 +10,6 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import org.bson.types.ObjectId
 import org.koin.ktor.ext.inject
 
 // TODO: Remover caso os templates sejam fixos no BD (sem manipulação pelo usuário)
@@ -34,7 +33,6 @@ fun Route.createChecklistRoutes() {
                 try {
                     repository.insert(
                         ChecklistTemplate(
-                            id = ObjectId(),
                             questions = questionRepository.findAll().map { it.id.toString() },
                             artifactTypes = artifactTypeRepository.findAll().map { it.id.toString() }
                         )

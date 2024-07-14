@@ -12,7 +12,6 @@ import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.networking.error.ConflictError
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.plugins.jwtVerifier
-import org.bson.types.ObjectId
 import org.mindrot.jbcrypt.BCrypt
 import java.util.Date
 
@@ -65,7 +64,6 @@ class AuthService(
 
         refreshTokenRepository.insert(
             RefreshToken(
-                id = ObjectId(),
                 refreshToken = refreshToken,
                 userId = userId
             )
@@ -88,7 +86,6 @@ class AuthService(
         if (existingUser == null) {
             userRepository.insert(
                 User(
-                    id = ObjectId(),
                     firstName = request.firstName,
                     lastName = request.lastName,
                     email = request.email,

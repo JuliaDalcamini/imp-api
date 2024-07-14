@@ -9,7 +9,7 @@ import org.bson.types.ObjectId
 data class RefreshToken(
     @Contextual
     @SerialName("_id")
-    val id: ObjectId,
+    val id: ObjectId = ObjectId(),
     val refreshToken: String,
     val userId: String
 )
