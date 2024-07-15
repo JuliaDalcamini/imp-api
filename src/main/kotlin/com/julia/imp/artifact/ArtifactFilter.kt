@@ -12,6 +12,6 @@ enum class ArtifactFilter {
     @SerialName("all") All;
 
     companion object {
-        fun fromString(string: String) = Json.Default.decodeFromString<ArtifactFilter>(string)
+        fun fromString(string: String) = Json.decodeFromString<ArtifactFilter>(string)
     }
 }
