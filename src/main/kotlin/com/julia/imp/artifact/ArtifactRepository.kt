@@ -38,6 +38,7 @@ class ArtifactRepository(database: MongoDatabase) : CrudRepository<Artifact>() {
             .find(
                 Filters.and(
                     Filters.eq("projectId", projectId),
+                    Filters.ne("archived", true),
                     Filters.all("inspectorIds", userId)
                 )
             )

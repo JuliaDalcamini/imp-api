@@ -8,6 +8,5 @@ data class UpdateArtifactRequest(
     val name: String,
     val artifactTypeId: String,
     val inspectorIds: List<String>,
-    val priority: Priority,
-    val archived: Boolean
+    val priority: Priority
 )

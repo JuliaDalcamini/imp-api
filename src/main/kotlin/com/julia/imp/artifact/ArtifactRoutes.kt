@@ -41,6 +41,16 @@ fun Route.artifactRoutes() {
                 call.respond(HttpStatusCode.Created, CreateArtifactResponse(artifactId))
             }
 
+            post("{id}/archive") {
+                service.archive(
+                    artifactId = call.parameters["id"] ?: throw BadRequestException("Missing artifact ID"),
+                    projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
+                    loggedUserId = call.authenticatedUserId
+                )
+
+                call.respond(HttpStatusCode.NoContent)
+            }
+
             patch("{id}") {
                 service.update(
                     request = call.receive<UpdateArtifactRequest>(),

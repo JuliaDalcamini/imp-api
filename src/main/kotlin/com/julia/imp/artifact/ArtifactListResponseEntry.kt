@@ -11,7 +11,8 @@ data class ArtifactListResponseEntry(
     val name: String,
     val type: ArtifactTypeResponse,
     val projectId: String,
-    val priority: Priority
+    val priority: Priority,
+    val archived: Boolean
 ) {
 
     companion object {
@@ -25,7 +26,8 @@ data class ArtifactListResponseEntry(
                     name = artifactType.name
                 ),
                 projectId = artifact.projectId,
-                priority = artifact.priority
+                priority = artifact.priority,
+                archived = artifact.archived
             )
     }
 }

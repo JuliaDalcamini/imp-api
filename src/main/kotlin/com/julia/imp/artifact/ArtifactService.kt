@@ -58,6 +58,24 @@ class ArtifactService(
         )
     }
 
+    suspend fun archive(artifactId: String, projectId: String, loggedUserId: String) {
+        if (!isUserAdmin(loggedUserId, projectId)) {
+            throw UnauthorizedError("Only admin can update artifacts")
+        }
+
+        val oldArtifact = repository.findById(artifactId)
+            ?: throw NotFoundException("Artifact not found")
+
+        if (projectId != oldArtifact.projectId) {
+            throw NotFoundException("Artifact not found")
+        }
+
+        repository.replaceById(
+            id = oldArtifact.id.toString(),
+            item = oldArtifact.copy(archived = true)
+        )
+    }
+
     suspend fun update(request: UpdateArtifactRequest, artifactId: String, projectId: String, loggedUserId: String) {
         if (!isUserAdmin(loggedUserId, projectId)) {
             throw UnauthorizedError("Only admin can update artifacts")
@@ -76,8 +94,7 @@ class ArtifactService(
                 name = request.name,
                 artifactTypeId = request.artifactTypeId,
                 inspectorIds = request.inspectorIds,
-                priority = request.priority,
-                archived = request.archived
+                priority = request.priority
             )
         )
     }
