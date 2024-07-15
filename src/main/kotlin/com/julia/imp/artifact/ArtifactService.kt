@@ -75,7 +75,9 @@ class ArtifactService(
             item = oldArtifact.copy(
                 name = request.name,
                 artifactTypeId = request.artifactTypeId,
-                inspectorIds = request.inspectorIds
+                inspectorIds = request.inspectorIds,
+                priority = request.priority,
+                archived = request.archived
             )
         )
     }
