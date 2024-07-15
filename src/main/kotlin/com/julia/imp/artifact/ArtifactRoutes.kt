@@ -1,6 +1,7 @@
 package com.julia.imp.artifact
 
 import com.julia.imp.auth.authenticatedUserId
+import com.julia.imp.common.networking.request.query
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
@@ -21,10 +22,10 @@ fun Route.artifactRoutes() {
     route("/projects/{projectId}/artifacts") {
         authenticate {
             get {
-                val artifacts = service.getAll(
+                val artifacts = service.get(
                     projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
                     loggedUserId = call.authenticatedUserId,
-                    filter = call.parameters["filter"]?.let { ArtifactFilter.fromString(it) } ?: ArtifactFilter.Active
+                    filter = call.query["filter"]?.let { ArtifactFilter.fromString(it) } ?: ArtifactFilter.Active
                 )
 
                 call.respond(artifacts)

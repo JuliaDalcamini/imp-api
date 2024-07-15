@@ -17,7 +17,7 @@ class ArtifactService(
     private val teamMemberRepository: TeamMemberRepository
 ) {
 
-    suspend fun getAll(
+    suspend fun get(
         projectId: String,
         loggedUserId: String,
         filter: ArtifactFilter

@@ -1,6 +1,7 @@
 package com.julia.imp.project
 
 import com.julia.imp.auth.authenticatedUserId
+import com.julia.imp.common.networking.request.query
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
@@ -22,7 +23,7 @@ fun Route.projectRoutes() {
         authenticate {
             get {
                 val projects = service.getAll(
-                    teamId = call.request.queryParameters["teamId"] ?: throw BadRequestException("Missing team ID"),
+                    teamId = call.query["teamId"] ?: throw BadRequestException("Missing team ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 
