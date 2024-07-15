@@ -17,12 +17,16 @@ class ArtifactService(
     private val teamMemberRepository: TeamMemberRepository
 ) {
 
-    suspend fun getAll(projectId: String, loggedUserId: String): List<ArtifactListResponseEntry> {
+    suspend fun getAll(
+        projectId: String,
+        loggedUserId: String,
+        filter: ArtifactFilter
+    ): List<ArtifactListResponseEntry> {
         if (!isUserMember(loggedUserId, projectId)) {
             throw UnauthorizedError("Only team members can see artifacts")
         }
 
-        val artifacts = repository.findByProjectId(projectId)
+        val artifacts = repository.findFiltered(projectId, loggedUserId, filter)
 
         return artifacts.map { artifact ->
             val type = typeRepository.findById(artifact.artifactTypeId)
@@ -49,6 +53,7 @@ class ArtifactService(
                 inspectorIds = request.inspectorIds,
                 creationDateTime = Clock.System.now(),
                 priority = request.priority,
+                archived = false
             )
         )
     }

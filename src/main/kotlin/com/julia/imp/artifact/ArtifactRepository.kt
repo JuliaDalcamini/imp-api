@@ -14,4 +14,42 @@ class ArtifactRepository(database: MongoDatabase) : CrudRepository<Artifact>() {
         collection
             .find(Filters.and(Filters.eq("projectId", projectId)))
             .toList()
+
+    suspend fun findFiltered(projectId: String, userId: String, filter: ArtifactFilter): List<Artifact> =
+        when (filter) {
+            ArtifactFilter.Active -> findActiveByProjectId(projectId)
+            ArtifactFilter.AssignedToMe -> findAssignedByProjectId(projectId, userId)
+            ArtifactFilter.Archived -> findArchivedByProjectId(projectId)
+            ArtifactFilter.All -> findByProjectId(projectId)
+        }
+
+    private suspend fun findActiveByProjectId(projectId: String): List<Artifact> =
+        collection
+            .find(
+                Filters.and(
+                    Filters.eq("projectId", projectId),
+                    Filters.ne("archived", true)
+                )
+            )
+            .toList()
+
+    private suspend fun findAssignedByProjectId(projectId: String, userId: String) =
+        collection
+            .find(
+                Filters.and(
+                    Filters.eq("projectId", projectId),
+                    Filters.all("inspectorIds", userId)
+                )
+            )
+            .toList()
+
+    private suspend fun findArchivedByProjectId(projectId: String): List<Artifact> =
+        collection
+            .find(
+                Filters.and(
+                    Filters.eq("projectId", projectId),
+                    Filters.eq("archived", true)
+                )
+            )
+            .toList()
 }

@@ -23,7 +23,8 @@ fun Route.artifactRoutes() {
             get {
                 val artifacts = service.getAll(
                     projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
-                    loggedUserId = call.authenticatedUserId
+                    loggedUserId = call.authenticatedUserId,
+                    filter = call.parameters["filter"]?.let { ArtifactFilter.fromString(it) } ?: ArtifactFilter.Active
                 )
 
                 call.respond(artifacts)
