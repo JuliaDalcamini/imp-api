@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AddTeamMemberRequest(
-    val userId: String,
+    val email: String,
     val role: Role
 )

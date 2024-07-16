@@ -28,7 +28,7 @@ class TeamMemberService(
             throw UnauthorizedError("Only team admins can add new team members")
         }
 
-        val userToAdd = userRepository.findById(request.userId)
+        val userToAdd = userRepository.findByEmail(request.email)
             ?: throw NotFoundException("User not found")
 
         try {
