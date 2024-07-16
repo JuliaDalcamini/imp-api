@@ -20,6 +20,15 @@ fun Route.teamMemberRoutes() {
 
     route("/teams/{teamId}/members") {
         authenticate {
+            get {
+                val members = service.get(
+                    teamId = call.parameters["teamId"] ?: throw BadRequestException("Missing team ID"),
+                    loggedUserId = call.authenticatedUserId
+                )
+
+                call.respond(members)
+            }
+
             get("{userId}") {
                 val member = service.get(
                     teamId = call.parameters["teamId"] ?: throw BadRequestException("Missing team ID"),

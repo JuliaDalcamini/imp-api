@@ -27,9 +27,9 @@ class TeamMemberRepository(database: MongoDatabase) : CrudRepository<TeamMember>
             .find(Filters.and(Filters.eq("userId", userId), Filters.eq("teamId", teamId)))
             .firstOrNull()
 
-    suspend fun findByUserId(userId: String): List<TeamMember> =
+    suspend fun findByTeamId(teamId: String): List<TeamMember> =
         collection
-            .find(Filters.and(Filters.eq("userId", userId)))
+            .find(Filters.and(Filters.eq("teamId", teamId)))
             .toList()
 
     suspend fun deleteByTeamId(id: String): Long {
@@ -44,5 +44,10 @@ class TeamMemberRepository(database: MongoDatabase) : CrudRepository<TeamMember>
 
     suspend fun findTeamsByUserId(userId: String): List<String> =
         findByUserId(userId).map { it.teamId }
+
+    private suspend fun findByUserId(userId: String): List<TeamMember> =
+        collection
+            .find(Filters.and(Filters.eq("userId", userId)))
+            .toList()
 
 }

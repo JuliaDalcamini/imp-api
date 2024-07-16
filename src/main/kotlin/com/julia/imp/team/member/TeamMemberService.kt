@@ -12,6 +12,21 @@ class TeamMemberService(
     private val userRepository: UserRepository
 ) {
 
+    suspend fun get(teamId: String, loggedUserId: String): List<TeamMemberResponse> {
+        if (!repository.isMember(loggedUserId, teamId)) {
+            throw UnauthorizedError("Only team members can see other team members")
+        }
+
+        val teamMembers = repository.findByTeamId(teamId)
+
+        return teamMembers.map { member ->
+            val user = userRepository.findById(member.userId)
+                ?: throw NotFoundException("Member not found")
+
+            TeamMemberResponse.of(member, user)
+        }
+    }
+
     suspend fun get(teamId: String, userId: String, loggedUserId: String): TeamMemberResponse {
         if (!repository.isMember(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team members can see other team members")
@@ -20,7 +35,10 @@ class TeamMemberService(
         val teamMember = repository.findByUserIdAndTeamId(userId, teamId)
             ?: throw NotFoundException("Member not found")
 
-        return TeamMemberResponse.of(teamMember)
+        val user = userRepository.findById(teamMember.userId)
+            ?: throw NotFoundException("Member not found")
+
+        return TeamMemberResponse.of(teamMember, user)
     }
 
     suspend fun add(teamId: String, request: AddTeamMemberRequest, loggedUserId: String): String {
