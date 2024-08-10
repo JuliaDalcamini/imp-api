@@ -16,7 +16,7 @@ import org.koin.ktor.ext.inject
 fun Route.inspectionRoutes() {
     val service by inject<InspectionService>()
 
-    route("/artifacts/{artifactId}/inspections") {
+    route("artifacts/{artifactId}/inspections") {
         authenticate {
             post {
                 val inspectionId = service.create(

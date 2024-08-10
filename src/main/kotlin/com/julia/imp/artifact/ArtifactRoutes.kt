@@ -19,7 +19,7 @@ import org.koin.ktor.ext.inject
 fun Route.artifactRoutes() {
     val service by inject<ArtifactService>()
 
-    route("/projects/{projectId}/artifacts") {
+    route("projects/{projectId}/artifacts") {
         authenticate {
             get {
                 val artifacts = service.get(
@@ -32,13 +32,13 @@ fun Route.artifactRoutes() {
             }
 
             post {
-                val artifactId = service.create(
+                val artifact = service.create(
                     request = call.receive<CreateArtifactRequest>(),
                     projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 
-                call.respond(HttpStatusCode.Created, CreateArtifactResponse(artifactId))
+                call.respond(HttpStatusCode.Created, artifact)
             }
 
             post("{id}/archive") {
@@ -52,14 +52,14 @@ fun Route.artifactRoutes() {
             }
 
             patch("{id}") {
-                service.update(
+                val artifact = service.update(
                     request = call.receive<UpdateArtifactRequest>(),
                     artifactId = call.parameters["id"] ?: throw BadRequestException("Missing artifact ID"),
                     projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 
-                call.respond(HttpStatusCode.NoContent)
+                call.respond(artifact)
             }
 
             delete("{id}") {

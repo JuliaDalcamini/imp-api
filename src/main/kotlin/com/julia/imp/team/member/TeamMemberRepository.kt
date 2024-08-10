@@ -29,7 +29,20 @@ class TeamMemberRepository(database: MongoDatabase) : CrudRepository<TeamMember>
 
     suspend fun findByTeamId(teamId: String): List<TeamMember> =
         collection
-            .find(Filters.and(Filters.eq("teamId", teamId)))
+            .find(Filters.eq("teamId", teamId))
+            .toList()
+
+    suspend fun findInspectorsByTeamId(teamId: String): List<TeamMember> =
+        collection
+            .find(
+                Filters.and(
+                    Filters.eq("teamId", teamId),
+                    Filters.or(
+                        Filters.eq("role", Role.Admin.code),
+                        Filters.eq("role", Role.Inspector.code)
+                    )
+                )
+            )
             .toList()
 
     suspend fun deleteByTeamId(id: String): Long {

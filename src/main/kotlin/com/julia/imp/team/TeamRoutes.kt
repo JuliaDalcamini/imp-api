@@ -18,7 +18,7 @@ import org.koin.ktor.ext.inject
 fun Route.teamRoutes() {
     val service by inject<TeamService>()
 
-    route("/teams") {
+    route("teams") {
         authenticate {
             get {
                 val teams = service.get(

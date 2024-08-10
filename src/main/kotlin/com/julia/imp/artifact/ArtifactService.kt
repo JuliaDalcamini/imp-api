@@ -1,6 +1,7 @@
 package com.julia.imp.artifact
 
 import com.julia.imp.artifactType.ArtifactTypeRepository
+import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.db.error.ItemNotFoundException
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.project.ProjectRepository
@@ -14,14 +15,15 @@ class ArtifactService(
     private val repository: ArtifactRepository,
     private val typeRepository: ArtifactTypeRepository,
     private val projectRepository: ProjectRepository,
-    private val teamMemberRepository: TeamMemberRepository
+    private val teamMemberRepository: TeamMemberRepository,
+    private val userRepository: UserRepository
 ) {
 
     suspend fun get(
         projectId: String,
         loggedUserId: String,
         filter: ArtifactFilter
-    ): List<ArtifactListResponseEntry> {
+    ): List<ArtifactResponse> {
         if (!isUserMember(loggedUserId, projectId)) {
             throw UnauthorizedError("Only team members can see artifacts")
         }
@@ -32,19 +34,24 @@ class ArtifactService(
             val type = typeRepository.findById(artifact.artifactTypeId)
                 ?: throw IllegalStateException("Artifact type not found")
 
-            ArtifactListResponseEntry.of(
+            val inspectors = artifact.inspectorIds.map {
+                userRepository.findById(it) ?: throw IllegalStateException("Inspector not found")
+            }
+
+            ArtifactResponse.of(
                 artifact = artifact,
-                artifactType = type
+                artifactType = type,
+                inspectors = inspectors
             )
         }
     }
 
-    suspend fun create(request: CreateArtifactRequest, projectId: String, loggedUserId: String): String {
+    suspend fun create(request: CreateArtifactRequest, projectId: String, loggedUserId: String): ArtifactResponse {
         if (!isUserAdmin(loggedUserId, projectId)) {
             throw UnauthorizedError("Only admin can add artifacts")
         }
 
-        return repository.insert(
+        val artifact = repository.insertAndGet(
             Artifact(
                 name = request.name,
                 artifactTypeId = request.artifactTypeId,
@@ -55,6 +62,19 @@ class ArtifactService(
                 priority = request.priority,
                 archived = false
             )
+        )
+
+        val type = typeRepository.findById(artifact.artifactTypeId)
+            ?: throw IllegalStateException("Artifact type not found")
+
+        val inspectors = artifact.inspectorIds.map {
+            userRepository.findById(it) ?: throw IllegalStateException("Inspector not found")
+        }
+
+        return ArtifactResponse.of(
+            artifact = artifact,
+            artifactType = type,
+            inspectors = inspectors
         )
     }
 
@@ -76,7 +96,12 @@ class ArtifactService(
         )
     }
 
-    suspend fun update(request: UpdateArtifactRequest, artifactId: String, projectId: String, loggedUserId: String) {
+    suspend fun update(
+        request: UpdateArtifactRequest,
+        artifactId: String,
+        projectId: String,
+        loggedUserId: String
+    ): ArtifactResponse {
         if (!isUserAdmin(loggedUserId, projectId)) {
             throw UnauthorizedError("Only admin can update artifacts")
         }
@@ -88,14 +113,29 @@ class ArtifactService(
             throw NotFoundException("Artifact not found")
         }
 
+        val updatedArtifact = oldArtifact.copy(
+            name = request.name,
+            artifactTypeId = request.artifactTypeId,
+            inspectorIds = request.inspectorIds,
+            priority = request.priority
+        )
+
         repository.replaceById(
             id = oldArtifact.id.toString(),
-            item = oldArtifact.copy(
-                name = request.name,
-                artifactTypeId = request.artifactTypeId,
-                inspectorIds = request.inspectorIds,
-                priority = request.priority
-            )
+            item = updatedArtifact
+        )
+
+        val type = typeRepository.findById(updatedArtifact.artifactTypeId)
+            ?: throw IllegalStateException("Artifact type not found")
+
+        val inspectors = updatedArtifact.inspectorIds.map {
+            userRepository.findById(it) ?: throw IllegalStateException("Inspector not found")
+        }
+
+        return ArtifactResponse.of(
+            artifact = updatedArtifact,
+            artifactType = type,
+            inspectors = inspectors
         )
     }
 

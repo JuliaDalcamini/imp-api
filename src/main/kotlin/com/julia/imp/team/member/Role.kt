@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class Role {
-    @SerialName("admin") Admin,
-    @SerialName("inspector") Inspector,
-    @SerialName("viewer") Viewer
+enum class Role(val code: String) {
+    @SerialName("admin") Admin("admin"),
+    @SerialName("inspector") Inspector("inspector"),
+    @SerialName("viewer") Viewer("viewer")
 }

@@ -12,17 +12,17 @@ import org.koin.ktor.ext.inject
 fun Route.authRoutes() {
     val service by inject<AuthService>()
 
-    post("/login") {
+    post("login") {
         val response = service.login(request = call.receive<LoginRequest>())
         call.respond(response)
     }
 
-    post("/refresh_tokens") {
+    post("refresh_tokens") {
         val tokens = service.refreshTokens(request = call.receive<RefreshTokensRequest>())
         call.respond(tokens)
     }
 
-    post("/register") {
+    post("register") {
         service.register(request = call.receive<RegisterRequest>())
         call.respond(HttpStatusCode.Created)
     }

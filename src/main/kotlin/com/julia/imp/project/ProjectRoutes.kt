@@ -19,7 +19,7 @@ import org.koin.ktor.ext.inject
 fun Route.projectRoutes() {
     val service by inject<ProjectService>()
 
-    route("/projects") {
+    route("projects") {
         authenticate {
             get {
                 val projects = service.getAll(

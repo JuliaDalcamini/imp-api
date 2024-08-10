@@ -23,7 +23,7 @@ fun Route.createChecklistRoutes() {
     val questionRepository by inject<QuestionRepository>()
     val artifactTypeRepository by inject<ArtifactTypeRepository>()
 
-    route("/checklists") {
+    route("checklists") {
         authenticate {
             get {
                 

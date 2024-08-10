@@ -3,6 +3,7 @@ package com.julia.imp.plugins
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.artifact.ArtifactService
 import com.julia.imp.artifactType.ArtifactTypeRepository
+import com.julia.imp.artifactType.ArtifactTypeService
 import com.julia.imp.auth.AuthService
 import com.julia.imp.auth.refresh.RefreshTokenRepository
 import com.julia.imp.auth.user.UserRepository
@@ -15,6 +16,7 @@ import com.julia.imp.project.ProjectService
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.TeamService
+import com.julia.imp.team.inspector.InspectorService
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.TeamMemberService
 import com.mongodb.kotlin.client.coroutine.MongoClient
@@ -36,13 +38,16 @@ fun Application.configureDependencyInjection() {
                 single<RefreshTokenRepository> { RefreshTokenRepository(get()) }
                 single<AuthService> { AuthService(get(), get()) }
                 single<ArtifactRepository> { ArtifactRepository(get()) }
-                single<ArtifactService> { ArtifactService(get(), get(), get(), get()) }
+                single<ArtifactService> { ArtifactService(get(), get(), get(), get(), get()) }
+                single<ArtifactTypeRepository> { ArtifactTypeRepository(get()) }
+                single<ArtifactTypeService> { ArtifactTypeService(get()) }
                 single<ProjectRepository> { ProjectRepository(get()) }
                 single<ProjectService> { ProjectService(get(), get(), get(), get()) }
                 single<TeamRepository> { TeamRepository(get()) }
                 single<TeamService> { TeamService(get(), get()) }
                 single<TeamMemberRepository> { TeamMemberRepository(get()) }
                 single<TeamMemberService> { TeamMemberService(get(), get()) }
+                single<InspectorService> { InspectorService(get(), get()) }
                 single<QuestionRepository> { QuestionRepository(get()) }
                 single<ChecklistRepository> { ChecklistRepository(get()) }
                 single<ArtifactTypeRepository> { ArtifactTypeRepository(get()) }

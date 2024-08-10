@@ -10,7 +10,7 @@ import org.koin.ktor.ext.inject
 fun Route.questionRoutes() {
     val service by inject<TeamService>()
 
-    route("/questions") {
+    route("questions") {
         authenticate {
             get {}
         }
