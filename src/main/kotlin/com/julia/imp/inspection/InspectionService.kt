@@ -5,91 +5,115 @@ import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.inspection.answer.InspectionAnswer
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
+import com.julia.imp.inspection.answer.InspectionAnswerResponse
 import com.julia.imp.project.ProjectRepository
+import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
+import com.julia.imp.team.member.canInspect
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.NotFoundException
+import kotlinx.datetime.Clock
 
 class InspectionService(
     private val repository: InspectionRepository,
     private val artifactRepository: ArtifactRepository,
     private val answerRepository: InspectionAnswerRepository,
+    private val questionRepository: QuestionRepository,
     private val projectRepository: ProjectRepository,
     private val teamMemberRepository: TeamMemberRepository,
     private val userRepository: UserRepository
 ) {
 
-    suspend fun create(request: CreateInspectionRequest, artifactId: String, loggedUserId: String): String {
-
-        if (!isInspector(loggedUserId, artifactId)) {
-            throw UnauthorizedError("Only an assigned inspector can inspect")
+    suspend fun create(
+        request: CreateInspectionRequest,
+        artifactId: String,
+        projectId: String,
+        loggedUserId: String
+    ): InspectionResponse {
+        if (!canInspectArtifact(loggedUserId, artifactId, projectId)) {
+            throw UnauthorizedError("Only assigned inspectors can inspect")
         }
 
-        val inspectionId = repository.insert(
+        val inspection = repository.insertAndGet(
             Inspection(
                 artifactId = artifactId,
                 inspectorId = loggedUserId,
                 duration = request.duration,
-                lastUpdate = request.lastUpdate
+                createdAt = Clock.System.now()
             )
         )
 
-        for (pair in request.answers.entries) {
-            answerRepository.insert(
+        val answers = request.answers.entries.map { pair ->
+            val answer = answerRepository.insertAndGet(
                 InspectionAnswer(
-                    inspectionId = inspectionId,
+                    inspectionId = inspection.id.toString(),
                     questionId = pair.key,
                     answer = pair.value
                 )
             )
+
+            val question = questionRepository.findById(pair.key)
+                ?: throw IllegalStateException("Question not found")
+
+            InspectionAnswerResponse.of(answer, question)
         }
 
-        return inspectionId
+        val inspector = userRepository.findById(inspection.inspectorId)
+            ?: throw IllegalStateException("Inspector not found")
+
+        return InspectionResponse.of(
+            inspection = inspection,
+            inspector = inspector,
+            answers = answers
+        )
     }
 
-    suspend fun getAll(artifactId: String, loggedUserId: String): List<InspectionResponse> {
-
-        if (!isProjectMember(loggedUserId, artifactId)) {
-            throw UnauthorizedError("Only project members can view an inspection")
+    suspend fun getAll(artifactId: String, projectId: String, loggedUserId: String): List<InspectionResponse> {
+        if (!canViewInspections(loggedUserId, artifactId, projectId)) {
+            throw UnauthorizedError("Only team members can view inspections")
         }
 
         val inspections = repository.findByArtifactId(artifactId)
 
         return inspections.map { inspection ->
             val inspector = userRepository.findById(inspection.inspectorId)
-                ?: throw NotFoundException("Inspector not found")
+                ?: throw IllegalStateException("Inspector not found")
+
+            val answers = answerRepository.findByInspectionId(inspection.id.toString()).map {
+                val question = questionRepository.findById(it.questionId)
+                    ?: throw IllegalStateException("Question not found")
+
+                InspectionAnswerResponse.of(it, question)
+            }
 
             InspectionResponse.of(
                 inspection = inspection,
-                inspector = inspector
+                inspector = inspector,
+                answers = answers
             )
         }
     }
 
-    suspend fun update(inspectionId: String, request: UpdateInspectionRequest, loggedUserId: String) {
-        val oldInspection = repository.findById(inspectionId)
-            ?: throw NotFoundException("Inspection not found")
+    private suspend fun canInspectArtifact(userId: String, artifactId: String, projectId: String): Boolean {
+        val artifact = artifactRepository.findById(artifactId) ?: return false
 
-        if (!isInspector(loggedUserId, oldInspection.artifactId)) {
-            throw UnauthorizedError("Only assigned inspector can update an inspection")
+        return if (projectId == artifact.projectId) {
+            val project = projectRepository.findById(projectId) ?: return false
+            val isTeamInspector = teamMemberRepository.canInspect(userId, project.teamId)
+
+            isTeamInspector && artifact.inspectorIds.contains(userId)
+        } else {
+            false
         }
-
-        repository.replaceById(
-            id = oldInspection.id.toString(),
-            item = oldInspection.copy(
-                duration = request.duration
-            )
-        )
     }
 
-    private suspend fun isInspector(userId: String, artifactId: String): Boolean {
+    private suspend fun canViewInspections(userId: String, artifactId: String, projectId: String): Boolean {
         val artifact = artifactRepository.findById(artifactId) ?: return false
-        return artifact.inspectorIds.contains(userId)
-    }
 
-    private suspend fun isProjectMember(userId: String, artifactId: String): Boolean {
-        val artifact = artifactRepository.findById(artifactId) ?: return false
-        val project = projectRepository.findById(artifact.projectId) ?: return false
-        return teamMemberRepository.isMember(userId, project.teamId)
+        return if (projectId == artifact.projectId) {
+            val project = projectRepository.findById(artifact.projectId) ?: return false
+            teamMemberRepository.isMember(userId, project.teamId)
+        } else {
+            false
+        }
     }
 }

@@ -6,5 +6,8 @@ suspend fun TeamMemberRepository.getUserRole(userId: String, teamId: String): Ro
 suspend fun TeamMemberRepository.isAdmin(userId: String, teamId: String): Boolean =
     getUserRole(userId, teamId) == Role.Admin
 
+suspend fun TeamMemberRepository.canInspect(userId: String, teamId: String): Boolean =
+    getUserRole(userId, teamId).let { it == Role.Inspector || it == Role.Admin }
+
 suspend fun TeamMemberRepository.isMember(userId: String, teamId: String): Boolean =
     findByUserIdAndTeamId(userId, teamId) != null

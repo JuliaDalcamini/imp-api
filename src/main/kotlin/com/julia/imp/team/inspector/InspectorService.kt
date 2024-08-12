@@ -1,17 +1,17 @@
 package com.julia.imp.team.inspector
 
 import com.julia.imp.auth.user.UserRepository
+import com.julia.imp.auth.user.UserResponse
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.NotFoundException
 
 class InspectorService(
     private val teamMemberRepository: TeamMemberRepository,
     private val userRepository: UserRepository
 ) {
 
-    suspend fun get(teamId: String, loggedUserId: String): List<InspectorResponse> {
+    suspend fun get(teamId: String, loggedUserId: String): List<UserResponse> {
         if (!teamMemberRepository.isMember(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team members can see team inspectors")
         }
@@ -20,9 +20,9 @@ class InspectorService(
 
         return teamMembers.map { member ->
             val user = userRepository.findById(member.userId)
-                ?: throw NotFoundException("Member not found")
+                ?: throw IllegalStateException("Member not found")
 
-            InspectorResponse.of(user)
+            UserResponse.of(user)
         }
     }
 }

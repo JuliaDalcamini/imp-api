@@ -52,7 +52,7 @@ fun Application.configureDependencyInjection() {
                 single<ChecklistRepository> { ChecklistRepository(get()) }
                 single<ArtifactTypeRepository> { ArtifactTypeRepository(get()) }
                 single<InspectionRepository> { InspectionRepository(get()) }
-                single<InspectionService> { InspectionService(get(), get(), get(), get(), get(), get()) }
+                single<InspectionService> { InspectionService(get(), get(), get(), get(), get(), get(), get()) }
                 single<InspectionAnswerRepository> { InspectionAnswerRepository(get()) }
             }
         )

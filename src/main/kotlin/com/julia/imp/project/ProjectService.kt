@@ -29,7 +29,7 @@ class ProjectService(
 
         return projects.map { project ->
             val creator = userRepository.findById(project.creatorId)
-                ?: throw NotFoundException("Project creator not found")
+                ?: throw IllegalStateException("Project creator not found")
 
             ProjectResponse.of(
                 project = project,
@@ -48,10 +48,10 @@ class ProjectService(
         }
 
         val creator = userRepository.findById(project.creatorId)
-            ?: throw NotFoundException("Project creator not found")
+            ?: throw IllegalStateException("Project creator not found")
 
         val team = teamRepository.findById(project.teamId)
-            ?: throw NotFoundException("Team not found")
+            ?: throw IllegalStateException("Team not found")
 
         return ProjectResponse.of(
             project = project,

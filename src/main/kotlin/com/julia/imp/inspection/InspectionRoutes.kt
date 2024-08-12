@@ -16,25 +16,27 @@ import org.koin.ktor.ext.inject
 fun Route.inspectionRoutes() {
     val service by inject<InspectionService>()
 
-    route("artifacts/{artifactId}/inspections") {
+    route("projects/{projectId}/artifacts/{artifactId}/inspections") {
         authenticate {
-            post {
-                val inspectionId = service.create(
-                    artifactId = call.parameters["artifactId"] ?: throw BadRequestException("Missing artifact ID"),
-                    request = call.receive<CreateInspectionRequest>(),
-                    loggedUserId = call.authenticatedUserId
-                )
-
-                call.respond(HttpStatusCode.Created, CreateInspectionResponse(inspectionId))
-            }
-
             get {
                 val inspections = service.getAll(
                     artifactId = call.parameters["artifactId"] ?: throw BadRequestException("Missing artifact ID"),
+                    projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
                     loggedUserId = call.authenticatedUserId
                 )
 
                 call.respond(inspections)
+            }
+
+            post {
+                val inspection = service.create(
+                    request = call.receive<CreateInspectionRequest>(),
+                    artifactId = call.parameters["artifactId"] ?: throw BadRequestException("Missing artifact ID"),
+                    projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
+                    loggedUserId = call.authenticatedUserId
+                )
+
+                call.respond(HttpStatusCode.Created, inspection)
             }
         }
     }

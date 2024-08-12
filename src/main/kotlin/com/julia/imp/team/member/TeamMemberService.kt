@@ -21,7 +21,7 @@ class TeamMemberService(
 
         return teamMembers.map { member ->
             val user = userRepository.findById(member.userId)
-                ?: throw NotFoundException("Member not found")
+                ?: throw IllegalStateException("Member not found")
 
             TeamMemberResponse.of(member, user)
         }
@@ -84,7 +84,7 @@ class TeamMemberService(
         try {
             repository.deleteByUserIdAndTeamId(userId, teamId)
         } catch (error: ItemNotFoundException) {
-            throw NotFoundException("Team member not found")
+            throw NotFoundException("Member not found")
         }
     }
 }

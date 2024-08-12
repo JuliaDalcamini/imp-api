@@ -31,6 +31,16 @@ fun Route.artifactRoutes() {
                 call.respond(artifacts)
             }
 
+            get("{id}") {
+                val artifact = service.get(
+                    artifactId = call.parameters["id"] ?: throw BadRequestException("Missing artifact ID"),
+                    projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
+                    loggedUserId = call.authenticatedUserId
+                )
+
+                call.respond(artifact)
+            }
+
             post {
                 val artifact = service.create(
                     request = call.receive<CreateArtifactRequest>(),

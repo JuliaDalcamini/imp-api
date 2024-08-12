@@ -1,10 +1,9 @@
-package com.julia.imp.team.inspector
+package com.julia.imp.auth.user
 
-import com.julia.imp.auth.user.User
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class InspectorResponse(
+data class UserResponse(
     val id: String,
     val firstName: String,
     val lastName: String
@@ -12,7 +11,7 @@ data class InspectorResponse(
 
     companion object {
 
-        fun of(user: User) = InspectorResponse(
+        fun of(user: User) = UserResponse(
             id = user.id.toString(),
             firstName = user.firstName,
             lastName = user.lastName

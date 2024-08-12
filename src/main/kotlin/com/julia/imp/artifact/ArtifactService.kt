@@ -46,6 +46,32 @@ class ArtifactService(
         }
     }
 
+    suspend fun get(artifactId: String, projectId: String, loggedUserId: String): ArtifactResponse {
+        if (!isUserMember(loggedUserId, projectId)) {
+            throw UnauthorizedError("Only team members can see artifacts")
+        }
+
+        val artifact = repository.findById(artifactId)
+            ?: throw NotFoundException("Artifact not found")
+
+        if (projectId != artifact.projectId) {
+            throw NotFoundException("Artifact not found")
+        }
+
+        val type = typeRepository.findById(artifact.artifactTypeId)
+            ?: throw IllegalStateException("Artifact type not found")
+
+        val inspectors = artifact.inspectorIds.map {
+            userRepository.findById(it) ?: throw IllegalStateException("Inspector not found")
+        }
+
+        return ArtifactResponse.of(
+            artifact = artifact,
+            artifactType = type,
+            inspectors = inspectors
+        )
+    }
+
     suspend fun create(request: CreateArtifactRequest, projectId: String, loggedUserId: String): ArtifactResponse {
         if (!isUserAdmin(loggedUserId, projectId)) {
             throw UnauthorizedError("Only admin can add artifacts")

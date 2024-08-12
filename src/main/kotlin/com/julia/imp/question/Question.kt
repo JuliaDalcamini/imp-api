@@ -10,11 +10,8 @@ data class Question(
     @Contextual
     @SerialName("_id")
     val id: ObjectId = ObjectId(),
-    val question: String,
+    val text: String,
     val artifactTypeId: String,
     val severity: String,
-    val answer: Answer?,
-    val quantity: Int,
-    val observation: String,
     val defectTypeId: String
 )

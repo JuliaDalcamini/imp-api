@@ -3,8 +3,8 @@ package com.julia.imp.artifact
 import com.julia.imp.artifactType.ArtifactType
 import com.julia.imp.artifactType.ArtifactTypeResponse
 import com.julia.imp.auth.user.User
+import com.julia.imp.auth.user.UserResponse
 import com.julia.imp.priority.Priority
-import com.julia.imp.team.inspector.InspectorResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,7 +15,7 @@ data class ArtifactResponse(
     val projectId: String,
     val priority: Priority,
     val archived: Boolean,
-    val inspectors: List<InspectorResponse>
+    val inspectors: List<UserResponse>
 ) {
 
     companion object {
@@ -28,7 +28,7 @@ data class ArtifactResponse(
                 projectId = artifact.projectId,
                 priority = artifact.priority,
                 archived = artifact.archived,
-                inspectors = inspectors.map { InspectorResponse.of(it) }
+                inspectors = inspectors.map { UserResponse.of(it) }
             )
     }
 }

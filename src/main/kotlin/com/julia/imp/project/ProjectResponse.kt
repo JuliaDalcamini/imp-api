@@ -1,8 +1,10 @@
 package com.julia.imp.project
 
 import com.julia.imp.auth.user.User
+import com.julia.imp.auth.user.UserResponse
 import com.julia.imp.priority.Prioritizer
 import com.julia.imp.team.Team
+import com.julia.imp.team.TeamResponse
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
@@ -11,23 +13,10 @@ data class ProjectResponse(
     val id: String,
     val name: String,
     val creationDateTime: Instant,
-    val creator: ProjectCreator,
+    val creator: UserResponse,
     val prioritizer: Prioritizer,
-    val team: ProjectTeam
+    val team: TeamResponse
 ) {
-
-    @Serializable
-    data class ProjectCreator(
-        val id: String,
-        val firstName: String,
-        val lastName: String
-    )
-
-    @Serializable
-    data class ProjectTeam(
-        val id: String,
-        val name: String
-    )
 
     companion object {
 
@@ -35,16 +24,9 @@ data class ProjectResponse(
             id = project.id.toString(),
             name = project.name,
             creationDateTime = project.creationDateTime,
-            creator = ProjectCreator(
-                id = creator.id.toString(),
-                firstName = creator.firstName,
-                lastName = creator.lastName
-            ),
+            creator = UserResponse.of(creator),
             prioritizer = project.prioritizer,
-            team = ProjectTeam(
-                id = team.id.toString(),
-                name = team.name
-            )
+            team = TeamResponse.of(team)
         )
     }
 }
