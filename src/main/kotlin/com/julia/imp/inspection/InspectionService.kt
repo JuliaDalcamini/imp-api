@@ -2,6 +2,7 @@ package com.julia.imp.inspection
 
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.auth.user.UserRepository
+import com.julia.imp.checklist.DefectTypeRepository
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.inspection.answer.InspectionAnswer
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
@@ -18,6 +19,7 @@ class InspectionService(
     private val artifactRepository: ArtifactRepository,
     private val answerRepository: InspectionAnswerRepository,
     private val questionRepository: QuestionRepository,
+    private val defectTypeRepository: DefectTypeRepository,
     private val projectRepository: ProjectRepository,
     private val teamMemberRepository: TeamMemberRepository,
     private val userRepository: UserRepository
@@ -54,7 +56,14 @@ class InspectionService(
             val question = questionRepository.findById(pair.key)
                 ?: throw IllegalStateException("Question not found")
 
-            InspectionAnswerResponse.of(answer, question)
+            val defectType = defectTypeRepository.findById(question.defectTypeId)
+                ?: throw IllegalStateException("Defect type not found")
+
+            InspectionAnswerResponse.of(
+                inspectionAnswer = answer,
+                question = question,
+                defectType = defectType
+            )
         }
 
         val inspector = userRepository.findById(inspection.inspectorId)
@@ -82,7 +91,14 @@ class InspectionService(
                 val question = questionRepository.findById(it.questionId)
                     ?: throw IllegalStateException("Question not found")
 
-                InspectionAnswerResponse.of(it, question)
+                val defectType = defectTypeRepository.findById(question.defectTypeId)
+                    ?: throw IllegalStateException("Defect type not found")
+
+                InspectionAnswerResponse.of(
+                    inspectionAnswer = it,
+                    question = question,
+                    defectType = defectType
+                )
             }
 
             InspectionResponse.of(

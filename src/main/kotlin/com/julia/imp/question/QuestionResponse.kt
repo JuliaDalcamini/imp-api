@@ -1,5 +1,7 @@
 package com.julia.imp.question
 
+import com.julia.imp.checklist.DefectType
+import com.julia.imp.checklist.DefectTypeResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -8,17 +10,16 @@ data class QuestionResponse(
     val text: String,
     // TODO: Create and use Severity enum
     val severity: String,
-    // TODO: Create and use DefectType class
-    val defectTypeId: String
+    val defectType: DefectTypeResponse
 ) {
 
     companion object {
 
-        fun of(question: Question) = QuestionResponse(
+        fun of(question: Question, defectType: DefectType) = QuestionResponse(
             id = question.id.toString(),
             text = question.text,
             severity = question.severity,
-            defectTypeId = question.defectTypeId
+            defectType = DefectTypeResponse.of(defectType)
         )
     }
 }

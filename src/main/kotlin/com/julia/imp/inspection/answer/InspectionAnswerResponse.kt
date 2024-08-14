@@ -1,5 +1,6 @@
 package com.julia.imp.inspection.answer
 
+import com.julia.imp.checklist.DefectType
 import com.julia.imp.question.Answer
 import com.julia.imp.question.Question
 import com.julia.imp.question.QuestionResponse
@@ -14,9 +15,9 @@ data class InspectionAnswerResponse(
 
     companion object {
 
-        fun of(inspectionAnswer: InspectionAnswer, question: Question) = InspectionAnswerResponse(
+        fun of(inspectionAnswer: InspectionAnswer, question: Question, defectType: DefectType) = InspectionAnswerResponse(
             id = inspectionAnswer.id.toString(),
-            question = QuestionResponse.of(question),
+            question = QuestionResponse.of(question, defectType),
             answer = inspectionAnswer.answer
         )
     }
