@@ -1,4 +1,4 @@
-package com.julia.imp.artifactType
+package com.julia.imp.artifact.type
 
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
@@ -13,7 +13,7 @@ fun Route.artifactTypeRoutes() {
 
     route("artifact-types") {
         authenticate {
-            get { call.respond(service.get()) }
+            get { call.respond(service.getAll()) }
         }
     }
 }

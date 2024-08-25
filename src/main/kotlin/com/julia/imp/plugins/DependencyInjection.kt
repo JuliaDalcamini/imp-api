@@ -2,19 +2,19 @@ package com.julia.imp.plugins
 
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.artifact.ArtifactService
-import com.julia.imp.artifactType.ArtifactTypeRepository
-import com.julia.imp.artifactType.ArtifactTypeService
+import com.julia.imp.artifact.type.ArtifactTypeRepository
+import com.julia.imp.artifact.type.ArtifactTypeService
 import com.julia.imp.auth.AuthService
 import com.julia.imp.auth.refresh.RefreshTokenRepository
 import com.julia.imp.auth.user.UserRepository
-import com.julia.imp.checklist.ChecklistRepository
-import com.julia.imp.checklist.DefectTypeRepository
+import com.julia.imp.defecttype.DefectTypeRepository
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.inspection.InspectionService
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.project.ProjectService
 import com.julia.imp.question.QuestionRepository
+import com.julia.imp.question.QuestionService
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.TeamService
 import com.julia.imp.team.inspector.InspectorService
@@ -49,10 +49,10 @@ fun Application.configureDependencyInjection() {
                 single<TeamMemberRepository> { TeamMemberRepository(get()) }
                 single<TeamMemberService> { TeamMemberService(get(), get()) }
                 single<InspectorService> { InspectorService(get(), get()) }
-                single<QuestionRepository> { QuestionRepository(get()) }
                 single<DefectTypeRepository> { DefectTypeRepository(get()) }
-                single<ChecklistRepository> { ChecklistRepository(get()) }
                 single<ArtifactTypeRepository> { ArtifactTypeRepository(get()) }
+                single<QuestionRepository> { QuestionRepository(get()) }
+                single<QuestionService> { QuestionService(get(), get()) }
                 single<InspectionRepository> { InspectionRepository(get()) }
                 single<InspectionService> { InspectionService(get(), get(), get(), get(), get(), get(), get(), get()) }
                 single<InspectionAnswerRepository> { InspectionAnswerRepository(get()) }

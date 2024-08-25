@@ -12,6 +12,6 @@ data class Question(
     val id: ObjectId = ObjectId(),
     val text: String,
     val artifactTypeId: String,
-    val severity: String,
+    val severity: Severity,
     val defectTypeId: String
 )

@@ -1,6 +1,6 @@
 package com.julia.imp.artifact
 
-import com.julia.imp.artifactType.ArtifactTypeRepository
+import com.julia.imp.artifact.type.ArtifactTypeRepository
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.db.error.ItemNotFoundException
 import com.julia.imp.common.networking.error.UnauthorizedError

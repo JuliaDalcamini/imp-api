@@ -2,8 +2,8 @@ package com.julia.imp.inspection
 
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.auth.user.UserRepository
-import com.julia.imp.checklist.DefectTypeRepository
 import com.julia.imp.common.networking.error.UnauthorizedError
+import com.julia.imp.defecttype.DefectTypeRepository
 import com.julia.imp.inspection.answer.InspectionAnswer
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.inspection.answer.InspectionAnswerResponse

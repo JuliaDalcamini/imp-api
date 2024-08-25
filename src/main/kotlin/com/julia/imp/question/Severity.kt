@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class Answer {
-    @SerialName("na") NotApplicable,
-    @SerialName("yes") Yes,
-    @SerialName("no") No
+enum class Severity {
+    @SerialName("low") Low,
+    @SerialName("medium") Medium,
+    @SerialName("high") High
 }

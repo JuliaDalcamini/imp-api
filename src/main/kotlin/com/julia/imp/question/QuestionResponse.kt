@@ -1,15 +1,14 @@
 package com.julia.imp.question
 
-import com.julia.imp.checklist.DefectType
-import com.julia.imp.checklist.DefectTypeResponse
+import com.julia.imp.defecttype.DefectType
+import com.julia.imp.defecttype.DefectTypeResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class QuestionResponse(
     val id: String,
     val text: String,
-    // TODO: Create and use Severity enum
-    val severity: String,
+    val severity: Severity,
     val defectType: DefectTypeResponse
 ) {
 

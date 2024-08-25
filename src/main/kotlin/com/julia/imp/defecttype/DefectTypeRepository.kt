@@ -1,4 +1,4 @@
-package com.julia.imp.checklist
+package com.julia.imp.defecttype
 
 import com.julia.imp.common.db.CrudRepository
 import com.mongodb.kotlin.client.coroutine.MongoCollection

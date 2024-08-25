@@ -1,4 +1,4 @@
-package com.julia.imp.checklist
+package com.julia.imp.defecttype
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
@@ -6,10 +6,9 @@ import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
 
 @Serializable
-data class ChecklistTemplate(
+data class DefectType(
     @Contextual
     @SerialName("_id")
     val id: ObjectId = ObjectId(),
-    val artifactTypes: List<String>,
-    val questions: List<String>
-) : Checklist()
+    val name: String
+)

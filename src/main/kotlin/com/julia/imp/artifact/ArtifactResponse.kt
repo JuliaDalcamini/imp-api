@@ -1,7 +1,7 @@
 package com.julia.imp.artifact
 
-import com.julia.imp.artifactType.ArtifactType
-import com.julia.imp.artifactType.ArtifactTypeResponse
+import com.julia.imp.artifact.type.ArtifactType
+import com.julia.imp.artifact.type.ArtifactTypeResponse
 import com.julia.imp.auth.user.User
 import com.julia.imp.auth.user.UserResponse
 import com.julia.imp.priority.Priority

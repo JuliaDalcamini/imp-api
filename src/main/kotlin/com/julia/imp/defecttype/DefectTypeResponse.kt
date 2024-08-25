@@ -1,4 +1,4 @@
-package com.julia.imp.checklist
+package com.julia.imp.defecttype
 
 import kotlinx.serialization.Serializable
 

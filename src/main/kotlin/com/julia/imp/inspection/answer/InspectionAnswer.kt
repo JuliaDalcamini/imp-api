@@ -1,6 +1,5 @@
 package com.julia.imp.inspection.answer
 
-import com.julia.imp.question.Answer
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,5 +12,5 @@ data class InspectionAnswer(
     val id: ObjectId = ObjectId(),
     val inspectionId: String,
     val questionId: String,
-    val answer: Answer
+    val answer: AnswerOption
 )

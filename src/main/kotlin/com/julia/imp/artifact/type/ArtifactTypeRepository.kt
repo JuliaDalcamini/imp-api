@@ -1,4 +1,4 @@
-package com.julia.imp.artifactType
+package com.julia.imp.artifact.type
 
 import com.julia.imp.common.db.CrudRepository
 import com.mongodb.kotlin.client.coroutine.MongoCollection
