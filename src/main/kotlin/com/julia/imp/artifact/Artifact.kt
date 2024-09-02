@@ -18,6 +18,6 @@ data class Artifact(
     val creatorId: String,
     val inspectorIds: List<String>,
     val creationDateTime: Instant,
-    val priority: Priority,
+    val priority: Priority?,
     val archived: Boolean
 )

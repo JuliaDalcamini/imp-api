@@ -25,7 +25,7 @@ fun Route.artifactRoutes() {
                 val artifacts = service.get(
                     projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
                     loggedUserId = call.authenticatedUserId,
-                    filter = call.query["filter"]?.let { ArtifactFilter.fromString(it) } ?: ArtifactFilter.Active
+                    filter = call.query["filter"]?.let { ArtifactFilter.fromString(it) } ?: ArtifactFilter.AssignedToMe
                 )
 
                 call.respond(artifacts)

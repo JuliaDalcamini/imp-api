@@ -39,7 +39,7 @@ class TeamService(
         }
     }
 
-    suspend fun update(teamId: String, request: UpdateTeamRequest, loggedUserId: String) {
+    suspend fun update(teamId: String, request: UpdateTeamRequest, loggedUserId: String): TeamResponse {
 
         if (!isUserAdmin(loggedUserId, teamId)) {
             throw UnauthorizedError("Teams can only be updated by their admins")
@@ -48,10 +48,12 @@ class TeamService(
         val oldTeam = repository.findById(teamId)
             ?: throw NotFoundException("Team not found")
 
-        repository.replaceById(
+        val updatedTeam = repository.replaceByIdAndGet(
             id = oldTeam.id.toString(),
             item = oldTeam.copy(name = request.name)
         )
+
+        return TeamResponse.of(updatedTeam)
     }
 
     suspend fun delete(teamId: String, loggedUserId: String) {

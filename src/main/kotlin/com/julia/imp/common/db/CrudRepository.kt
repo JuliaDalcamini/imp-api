@@ -43,6 +43,11 @@ abstract class CrudRepository<T : Any> {
         replaceById(ObjectId(id), item)
     }
 
+    suspend fun replaceByIdAndGet(id: String, item: T): T {
+        replaceById(ObjectId(id), item)
+        return findById(id) ?: throw IOException("Failed to get updated item")
+    }
+
     open suspend fun deleteById(id: ObjectId) {
         val result = collection.deleteOne(Filters.eq("_id", id))
 

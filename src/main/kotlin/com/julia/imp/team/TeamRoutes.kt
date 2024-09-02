@@ -38,13 +38,13 @@ fun Route.teamRoutes() {
             }
 
             patch("{id}") {
-                service.update(
+                val team = service.update(
                     teamId = call.parameters["id"] ?: throw BadRequestException("Missing team ID"),
                     request = call.receive<UpdateTeamRequest>(),
                     loggedUserId = call.authenticatedUserId
                 )
 
-                call.respond(HttpStatusCode.NoContent)
+                call.respond(team)
             }
 
             delete("{id}") {

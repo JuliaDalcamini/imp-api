@@ -17,21 +17,12 @@ class ArtifactRepository(database: MongoDatabase) : CrudRepository<Artifact>() {
 
     suspend fun findFiltered(projectId: String, userId: String, filter: ArtifactFilter): List<Artifact> =
         when (filter) {
-            ArtifactFilter.Active -> findActiveByProjectId(projectId)
             ArtifactFilter.AssignedToMe -> findAssignedByProjectId(projectId, userId)
+            ArtifactFilter.Prioritized -> findPrioritizedByProjectId(projectId)
+            ArtifactFilter.NotPrioritized -> findNotPrioritizedByProjectId(projectId)
             ArtifactFilter.Archived -> findArchivedByProjectId(projectId)
             ArtifactFilter.All -> findByProjectId(projectId)
         }
-
-    private suspend fun findActiveByProjectId(projectId: String): List<Artifact> =
-        collection
-            .find(
-                Filters.and(
-                    Filters.eq("projectId", projectId),
-                    Filters.ne("archived", true)
-                )
-            )
-            .toList()
 
     private suspend fun findAssignedByProjectId(projectId: String, userId: String) =
         collection
@@ -40,6 +31,28 @@ class ArtifactRepository(database: MongoDatabase) : CrudRepository<Artifact>() {
                     Filters.eq("projectId", projectId),
                     Filters.ne("archived", true),
                     Filters.all("inspectorIds", userId)
+                )
+            )
+            .toList()
+
+    private suspend fun findPrioritizedByProjectId(projectId: String): List<Artifact> =
+        collection
+            .find(
+                Filters.and(
+                    Filters.eq("projectId", projectId),
+                    Filters.ne("archived", true),
+                    Filters.ne("priority", null)
+                )
+            )
+            .toList()
+
+    private suspend fun findNotPrioritizedByProjectId(projectId: String): List<Artifact> =
+        collection
+            .find(
+                Filters.and(
+                    Filters.eq("projectId", projectId),
+                    Filters.ne("archived", true),
+                    Filters.eq("priority", null)
                 )
             )
             .toList()

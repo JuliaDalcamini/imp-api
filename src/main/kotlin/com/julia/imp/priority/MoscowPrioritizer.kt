@@ -11,7 +11,7 @@ data object MoscowPrioritizer : Prioritizer() {
     override fun sort(artifacts: List<Artifact>): List<Artifact> =
         artifacts.sortedByDescending { calculatePriority(it.priority) }
 
-    private fun calculatePriority(priority: Priority): Int {
+    private fun calculatePriority(priority: Priority?): Int {
         if (priority !is MoscowPriority) throw IllegalArgumentException("Priority is not a MoscowPriority")
 
         return when (priority.level) {

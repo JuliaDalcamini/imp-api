@@ -13,7 +13,7 @@ data class ArtifactResponse(
     val name: String,
     val type: ArtifactTypeResponse,
     val projectId: String,
-    val priority: Priority,
+    val priority: Priority?,
     val archived: Boolean,
     val inspectors: List<UserResponse>
 ) {
