@@ -12,11 +12,8 @@ data class WiegersPrioritizer(
     val impactWeight: Double
 ) : Prioritizer() {
 
-    override fun sort(artifacts: List<Artifact>): List<Artifact> =
-        artifacts.sortedByDescending { calculatePriority(it.priority) }
-
-    private fun calculatePriority(priority: Priority?): Double {
-        if (priority !is WiegersPriority) throw IllegalArgumentException("Priority is not a WiegersPriority")
+    override fun calculatePriority(priority: Priority?): Double? {
+        if (priority !is WiegersPriority) return null
 
         return priority.userValue * this.userValueWeight +
                 priority.complexity * this.complexityWeight +

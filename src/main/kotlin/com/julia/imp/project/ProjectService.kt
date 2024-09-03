@@ -71,6 +71,7 @@ class ProjectService(
                 creationDateTime = Clock.System.now(),
                 creatorId = loggedUserId,
                 prioritizer = request.prioritizer,
+                totalInspectors = request.totalInspectors,
                 teamId = request.teamId
             )
         )

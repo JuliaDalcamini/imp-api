@@ -15,6 +15,7 @@ data class ProjectResponse(
     val creationDateTime: Instant,
     val creator: UserResponse,
     val prioritizer: Prioritizer,
+    val totalInspectors: Int,
     val team: TeamResponse
 ) {
 
@@ -26,6 +27,7 @@ data class ProjectResponse(
             creationDateTime = project.creationDateTime,
             creator = UserResponse.of(creator),
             prioritizer = project.prioritizer,
+            totalInspectors = project.totalInspectors,
             team = TeamResponse.of(team)
         )
     }

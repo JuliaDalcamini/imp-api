@@ -16,8 +16,6 @@ data class Project(
     val creationDateTime: Instant,
     val creatorId: String,
     val prioritizer: Prioritizer,
-    // TODO: Implement and remove nullability
-//    val checklist: Checklist?,
-//    val artifactsList: List<Artifact>,
+    val totalInspectors: Int,
     val teamId: String
 )

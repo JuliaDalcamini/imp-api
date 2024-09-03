@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
 data class CreateProjectRequest(
     val name: String,
     val prioritizer: Prioritizer,
+    val totalInspectors: Int,
     val teamId: String
 )

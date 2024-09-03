@@ -28,9 +28,10 @@ class ArtifactService(
             throw UnauthorizedError("Only team members can see artifacts")
         }
 
+        val project = projectRepository.findById(projectId) ?: throw IllegalStateException("Project not found")
         val artifacts = repository.findFiltered(projectId, loggedUserId, filter)
 
-        return artifacts.map { artifact ->
+        val mappedArtifacts = artifacts.map { artifact ->
             val type = typeRepository.findById(artifact.artifactTypeId)
                 ?: throw IllegalStateException("Artifact type not found")
 
@@ -41,15 +42,21 @@ class ArtifactService(
             ArtifactResponse.of(
                 artifact = artifact,
                 artifactType = type,
-                inspectors = inspectors
+                inspectors = inspectors,
+                prioritizer = project.prioritizer
             )
         }
+
+        return mappedArtifacts.sortedByDescending { it.calculatedPriority }
     }
 
     suspend fun get(artifactId: String, projectId: String, loggedUserId: String): ArtifactResponse {
         if (!isUserMember(loggedUserId, projectId)) {
             throw UnauthorizedError("Only team members can see artifacts")
         }
+
+        val project = projectRepository.findById(projectId)
+            ?: throw IllegalStateException("Project not found")
 
         val artifact = repository.findById(artifactId)
             ?: throw NotFoundException("Artifact not found")
@@ -68,7 +75,8 @@ class ArtifactService(
         return ArtifactResponse.of(
             artifact = artifact,
             artifactType = type,
-            inspectors = inspectors
+            inspectors = inspectors,
+            prioritizer = project.prioritizer
         )
     }
 
@@ -80,6 +88,7 @@ class ArtifactService(
         val artifact = repository.insertAndGet(
             Artifact(
                 name = request.name,
+                externalLink = request.externalLink,
                 artifactTypeId = request.artifactTypeId,
                 projectId = projectId,
                 creatorId = loggedUserId,
@@ -89,6 +98,9 @@ class ArtifactService(
                 archived = false
             )
         )
+
+        val project = projectRepository.findById(projectId)
+            ?: throw IllegalStateException("Project not found")
 
         val type = typeRepository.findById(artifact.artifactTypeId)
             ?: throw IllegalStateException("Artifact type not found")
@@ -100,7 +112,8 @@ class ArtifactService(
         return ArtifactResponse.of(
             artifact = artifact,
             artifactType = type,
-            inspectors = inspectors
+            inspectors = inspectors,
+            prioritizer = project.prioritizer
         )
     }
 
@@ -132,6 +145,9 @@ class ArtifactService(
             throw UnauthorizedError("Only admin can update artifacts")
         }
 
+        val project = projectRepository.findById(projectId)
+            ?: throw IllegalStateException("Project not found")
+
         val oldArtifact = repository.findById(artifactId)
             ?: throw NotFoundException("Artifact not found")
 
@@ -141,6 +157,7 @@ class ArtifactService(
 
         val updatedArtifact = oldArtifact.copy(
             name = request.name,
+            externalLink = request.externalLink,
             artifactTypeId = request.artifactTypeId,
             inspectorIds = request.inspectorIds,
             priority = request.priority
@@ -161,7 +178,8 @@ class ArtifactService(
         return ArtifactResponse.of(
             artifact = updatedArtifact,
             artifactType = type,
-            inspectors = inspectors
+            inspectors = inspectors,
+            prioritizer = project.prioritizer
         )
     }
 

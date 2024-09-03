@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class Prioritizer {
-    abstract fun sort(artifacts: List<Artifact>): List<Artifact>
+    abstract fun calculatePriority(priority: Priority?): Double?
 }

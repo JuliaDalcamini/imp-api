@@ -13,6 +13,7 @@ data class Artifact(
     @SerialName("_id")
     val id: ObjectId = ObjectId(),
     val name: String,
+    val externalLink: String,
     val artifactTypeId: String,
     val projectId: String,
     val creatorId: String,
