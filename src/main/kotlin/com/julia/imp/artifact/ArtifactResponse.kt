@@ -6,6 +6,7 @@ import com.julia.imp.auth.user.User
 import com.julia.imp.auth.user.UserResponse
 import com.julia.imp.priority.Prioritizer
 import com.julia.imp.priority.Priority
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,7 +19,9 @@ data class ArtifactResponse(
     val priority: Priority?,
     val archived: Boolean,
     val inspectors: List<UserResponse>,
-    val calculatedPriority: Double?
+    val calculatedPriority: Double?,
+    val lastModification: Instant,
+    val currentVersion: String
 ) {
 
     companion object {
@@ -33,7 +36,9 @@ data class ArtifactResponse(
                 priority = artifact.priority,
                 archived = artifact.archived,
                 inspectors = inspectors.map { UserResponse.of(it) },
-                calculatedPriority = prioritizer.calculatePriority(artifact.priority)
+                calculatedPriority = prioritizer.calculatePriority(artifact.priority),
+                lastModification = artifact.lastModification,
+                currentVersion = artifact.currentVersion
             )
     }
 }

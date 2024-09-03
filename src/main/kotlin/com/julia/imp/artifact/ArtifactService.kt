@@ -95,7 +95,9 @@ class ArtifactService(
                 inspectorIds = request.inspectorIds,
                 creationDateTime = Clock.System.now(),
                 priority = request.priority,
-                archived = false
+                archived = false,
+                lastModification = Clock.System.now(),
+                currentVersion = request.currentVersion
             )
         )
 
@@ -160,7 +162,9 @@ class ArtifactService(
             externalLink = request.externalLink,
             artifactTypeId = request.artifactTypeId,
             inspectorIds = request.inspectorIds,
-            priority = request.priority
+            priority = request.priority,
+            lastModification = Clock.System.now(),
+            currentVersion = request.currentVersion
         )
 
         repository.replaceById(
