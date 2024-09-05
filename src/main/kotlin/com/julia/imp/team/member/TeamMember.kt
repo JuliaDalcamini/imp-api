@@ -12,5 +12,6 @@ data class TeamMember(
     val id: ObjectId = ObjectId(),
     val userId: String,
     val teamId: String,
-    val role: Role
+    val role: Role,
+    val hourlyCost: Double
 )

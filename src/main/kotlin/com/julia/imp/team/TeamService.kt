@@ -21,14 +21,18 @@ class TeamService(
     }
 
     suspend fun create(request: CreateTeamRequest, loggedUserId: String): TeamResponse {
-        val team = repository.insertAndGet(Team(name = request.name))
+        val team = repository.insertAndGet(Team(
+            name = request.name,
+            defaultHourlyCost = request.defaultHourlyCost
+        ))
 
         try {
             teamMemberRepository.insert(
                 TeamMember(
                     userId = loggedUserId,
                     teamId = team.id.toString(),
-                    role = Role.Admin
+                    role = Role.Admin,
+                    hourlyCost = team.defaultHourlyCost
                 )
             )
 
@@ -50,7 +54,10 @@ class TeamService(
 
         val updatedTeam = repository.replaceByIdAndGet(
             id = oldTeam.id.toString(),
-            item = oldTeam.copy(name = request.name)
+            item = oldTeam.copy(
+                name = request.name,
+                defaultHourlyCost = request.defaultHourlyCost
+            )
         )
 
         return TeamResponse.of(updatedTeam)

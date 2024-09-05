@@ -5,11 +5,13 @@ import com.julia.imp.common.db.error.DuplicateItemException
 import com.julia.imp.common.db.error.ItemNotFoundException
 import com.julia.imp.common.networking.error.ConflictError
 import com.julia.imp.common.networking.error.UnauthorizedError
+import com.julia.imp.team.TeamRepository
 import io.ktor.server.plugins.NotFoundException
 
 class TeamMemberService(
     private val repository: TeamMemberRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val teamRepository: TeamRepository
 ) {
 
     suspend fun get(teamId: String, loggedUserId: String): List<TeamMemberResponse> {
@@ -49,12 +51,16 @@ class TeamMemberService(
         val userToAdd = userRepository.findByEmail(request.email)
             ?: throw NotFoundException("User not found")
 
+        val team = teamRepository.findById(teamId)
+            ?: throw NotFoundException("Team not found")
+
         try {
             return repository.insert(
                 TeamMember(
                     userId = userToAdd.id.toString(),
                     teamId = teamId,
-                    role = request.role
+                    role = request.role,
+                    hourlyCost = team.defaultHourlyCost
                 )
             )
         } catch (error: DuplicateItemException) {
@@ -72,7 +78,10 @@ class TeamMemberService(
 
         repository.replaceById(
             id = oldTeamMember.id.toString(),
-            item = oldTeamMember.copy(role = request.role)
+            item = oldTeamMember.copy(
+                role = request.role,
+                hourlyCost = request.hourlyCost
+            )
         )
     }
 

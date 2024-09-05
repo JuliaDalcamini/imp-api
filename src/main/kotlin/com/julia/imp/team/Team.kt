@@ -10,5 +10,6 @@ data class Team(
     @Contextual
     @SerialName("_id")
     val id: ObjectId = ObjectId(),
-    val name: String
+    val name: String,
+    val defaultHourlyCost: Double
 )
