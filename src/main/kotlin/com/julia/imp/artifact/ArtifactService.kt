@@ -4,6 +4,7 @@ import com.julia.imp.artifact.type.ArtifactTypeRepository
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.db.error.ItemNotFoundException
 import com.julia.imp.common.networking.error.UnauthorizedError
+import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isAdmin
@@ -15,6 +16,7 @@ class ArtifactService(
     private val repository: ArtifactRepository,
     private val typeRepository: ArtifactTypeRepository,
     private val projectRepository: ProjectRepository,
+    private val inspectionRepository: InspectionRepository,
     private val teamMemberRepository: TeamMemberRepository,
     private val userRepository: UserRepository
 ) {
@@ -39,11 +41,16 @@ class ArtifactService(
                 userRepository.findById(it) ?: throw IllegalStateException("Inspector not found")
             }
 
+            val totalCost = inspectionRepository
+                .findByArtifactId(artifact.id.toString())
+                .sumOf { it.cost }
+
             ArtifactResponse.of(
                 artifact = artifact,
                 artifactType = type,
                 inspectors = inspectors,
-                prioritizer = project.prioritizer
+                prioritizer = project.prioritizer,
+                totalCost = totalCost
             )
         }
 
@@ -72,11 +79,16 @@ class ArtifactService(
             userRepository.findById(it) ?: throw IllegalStateException("Inspector not found")
         }
 
+        val totalCost = inspectionRepository
+            .findByArtifactId(artifact.id.toString())
+            .sumOf { it.cost }
+
         return ArtifactResponse.of(
             artifact = artifact,
             artifactType = type,
             inspectors = inspectors,
-            prioritizer = project.prioritizer
+            prioritizer = project.prioritizer,
+            totalCost = totalCost
         )
     }
 
@@ -111,11 +123,16 @@ class ArtifactService(
             userRepository.findById(it) ?: throw IllegalStateException("Inspector not found")
         }
 
+        val totalCost = inspectionRepository
+            .findByArtifactId(artifact.id.toString())
+            .sumOf { it.cost }
+
         return ArtifactResponse.of(
             artifact = artifact,
             artifactType = type,
             inspectors = inspectors,
-            prioritizer = project.prioritizer
+            prioritizer = project.prioritizer,
+            totalCost = totalCost
         )
     }
 
@@ -179,11 +196,16 @@ class ArtifactService(
             userRepository.findById(it) ?: throw IllegalStateException("Inspector not found")
         }
 
+        val totalCost = inspectionRepository
+            .findByArtifactId(updatedArtifact.id.toString())
+            .sumOf { it.cost }
+
         return ArtifactResponse.of(
             artifact = updatedArtifact,
             artifactType = type,
             inspectors = inspectors,
-            prioritizer = project.prioritizer
+            prioritizer = project.prioritizer,
+            totalCost = totalCost
         )
     }
 

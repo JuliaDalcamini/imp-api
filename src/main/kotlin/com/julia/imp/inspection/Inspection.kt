@@ -15,5 +15,6 @@ data class Inspection(
     val artifactId: String,
     val inspectorId: String,
     val duration: Duration,
-    val createdAt: Instant
+    val createdAt: Instant,
+    val cost: Double
 )

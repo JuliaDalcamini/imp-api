@@ -12,7 +12,9 @@ import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.canInspect
 import com.julia.imp.team.member.isMember
+import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
+import kotlin.time.DurationUnit
 
 class InspectionService(
     private val repository: InspectionRepository,
@@ -35,12 +37,19 @@ class InspectionService(
             throw UnauthorizedError("Only assigned inspectors can inspect")
         }
 
+        val project = projectRepository.findById(projectId)
+            ?: throw NotFoundException("Project not found")
+
+        val member = teamMemberRepository.findByUserIdAndTeamId(loggedUserId, project.teamId)
+            ?: throw NotFoundException("Member not found")
+
         val inspection = repository.insertAndGet(
             Inspection(
                 artifactId = artifactId,
                 inspectorId = loggedUserId,
                 duration = request.duration,
-                createdAt = Clock.System.now()
+                createdAt = Clock.System.now(),
+                cost = request.duration.toDouble(DurationUnit.HOURS) * member.hourlyCost
             )
         )
 

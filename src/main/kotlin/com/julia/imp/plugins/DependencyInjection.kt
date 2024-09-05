@@ -39,7 +39,7 @@ fun Application.configureDependencyInjection() {
                 single<RefreshTokenRepository> { RefreshTokenRepository(get()) }
                 single<AuthService> { AuthService(get(), get()) }
                 single<ArtifactRepository> { ArtifactRepository(get()) }
-                single<ArtifactService> { ArtifactService(get(), get(), get(), get(), get()) }
+                single<ArtifactService> { ArtifactService(get(), get(), get(), get(), get(), get()) }
                 single<ArtifactTypeRepository> { ArtifactTypeRepository(get()) }
                 single<ArtifactTypeService> { ArtifactTypeService(get()) }
                 single<ProjectRepository> { ProjectRepository(get()) }

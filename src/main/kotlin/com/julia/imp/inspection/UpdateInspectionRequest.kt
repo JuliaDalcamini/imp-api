@@ -7,5 +7,6 @@ import kotlin.time.Duration
 @Serializable
 data class UpdateInspectionRequest(
     val duration: Duration,
-    val answers: List<InspectionAnswer>
+    val answers: List<InspectionAnswer>,
+    val cost: Double
 )

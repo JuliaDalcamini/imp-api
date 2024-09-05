@@ -13,7 +13,8 @@ data class InspectionResponse(
     val inspector: UserResponse,
     val duration: Duration,
     val createdAt: Instant,
-    val answers: List<InspectionAnswerResponse>
+    val answers: List<InspectionAnswerResponse>,
+    val cost: Double
 ) {
 
     companion object {
@@ -23,7 +24,8 @@ data class InspectionResponse(
             inspector = UserResponse.of(inspector),
             duration = inspection.duration,
             createdAt = inspection.createdAt,
-            answers = answers
+            answers = answers,
+            cost = inspection.cost
         )
     }
 }

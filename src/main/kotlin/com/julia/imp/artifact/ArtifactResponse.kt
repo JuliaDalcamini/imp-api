@@ -21,12 +21,13 @@ data class ArtifactResponse(
     val inspectors: List<UserResponse>,
     val calculatedPriority: Double?,
     val lastModification: Instant,
-    val currentVersion: String
+    val currentVersion: String,
+    val totalCost: Double
 ) {
 
     companion object {
 
-        fun of(artifact: Artifact, artifactType: ArtifactType, inspectors: List<User>, prioritizer: Prioritizer) =
+        fun of(artifact: Artifact, artifactType: ArtifactType, inspectors: List<User>, prioritizer: Prioritizer, totalCost: Double) =
             ArtifactResponse(
                 id = artifact.id.toString(),
                 name = artifact.name,
@@ -38,7 +39,8 @@ data class ArtifactResponse(
                 inspectors = inspectors.map { UserResponse.of(it) },
                 calculatedPriority = prioritizer.calculatePriority(artifact.priority),
                 lastModification = artifact.lastModification,
-                currentVersion = artifact.currentVersion
+                currentVersion = artifact.currentVersion,
+                totalCost = totalCost
             )
     }
 }
