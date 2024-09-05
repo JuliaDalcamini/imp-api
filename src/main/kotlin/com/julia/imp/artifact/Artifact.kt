@@ -22,5 +22,6 @@ data class Artifact(
     val priority: Priority?,
     val archived: Boolean,
     val lastModification: Instant,
-    val currentVersion: String
+    val currentVersion: String,
+    val inspected: Boolean
 )

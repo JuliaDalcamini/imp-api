@@ -1,5 +1,6 @@
 package com.julia.imp.inspection
 
+import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.networking.error.UnauthorizedError
@@ -7,6 +8,7 @@ import com.julia.imp.defecttype.DefectTypeRepository
 import com.julia.imp.inspection.answer.InspectionAnswer
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.inspection.answer.InspectionAnswerResponse
+import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
@@ -40,8 +42,13 @@ class InspectionService(
         val project = projectRepository.findById(projectId)
             ?: throw NotFoundException("Project not found")
 
+        val artifact = artifactRepository.findById(artifactId)
+            ?: throw NotFoundException("Artifact not found")
+
         val member = teamMemberRepository.findByUserIdAndTeamId(loggedUserId, project.teamId)
-            ?: throw NotFoundException("Member not found")
+            ?: throw IllegalStateException("Member not found")
+
+        val oldInspection = repository.findByArtifactId(artifactId).filter { it.inspectorId == loggedUserId }
 
         val inspection = repository.insertAndGet(
             Inspection(
@@ -49,7 +56,8 @@ class InspectionService(
                 inspectorId = loggedUserId,
                 duration = request.duration,
                 createdAt = Clock.System.now(),
-                cost = request.duration.toDouble(DurationUnit.HOURS) * member.hourlyCost
+                cost = request.duration.toDouble(DurationUnit.HOURS) * member.hourlyCost,
+                artifactVersion = artifact.currentVersion
             )
         )
 
@@ -75,6 +83,8 @@ class InspectionService(
             )
         }
 
+        updateArtifactInspectionState(artifact, project)
+
         val inspector = userRepository.findById(inspection.inspectorId)
             ?: throw IllegalStateException("Inspector not found")
 
@@ -83,6 +93,19 @@ class InspectionService(
             inspector = inspector,
             answers = answers
         )
+    }
+
+    private suspend fun updateArtifactInspectionState(artifact: Artifact, project: Project) {
+        val inspections = repository.findByArtifactId(artifact.id.toString())
+        val inspectionCount = inspections.count { it.artifactVersion == artifact.currentVersion }
+        val inspected = inspectionCount >= project.minInspectors
+
+        if (inspected != artifact.inspected) {
+            artifactRepository.replaceById(
+                id = artifact.id,
+                item = artifact.copy(inspected = inspected)
+            )
+        }
     }
 
     suspend fun getAll(artifactId: String, projectId: String, loggedUserId: String): List<InspectionResponse> {

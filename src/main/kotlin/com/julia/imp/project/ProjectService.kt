@@ -69,9 +69,10 @@ class ProjectService(
             Project(
                 name = request.name,
                 creationDateTime = Clock.System.now(),
+                targetDate = request.targetDate,
                 creatorId = loggedUserId,
                 prioritizer = request.prioritizer,
-                totalInspectors = request.totalInspectors,
+                minInspectors = request.minInspectors,
                 teamId = request.teamId
             )
         )
@@ -87,7 +88,11 @@ class ProjectService(
 
         repository.replaceById(
             id = oldProject.id.toString(),
-            item = oldProject.copy(name = request.name)
+            item = oldProject.copy(
+                name = request.name,
+                minInspectors = request.minInspectors,
+                targetDate = request.targetDate
+            )
         )
     }
 

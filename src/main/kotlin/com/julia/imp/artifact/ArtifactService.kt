@@ -109,7 +109,8 @@ class ArtifactService(
                 priority = request.priority,
                 archived = false,
                 lastModification = Clock.System.now(),
-                currentVersion = request.currentVersion
+                currentVersion = request.currentVersion,
+                inspected = false
             )
         )
 
@@ -174,6 +175,10 @@ class ArtifactService(
             throw NotFoundException("Artifact not found")
         }
 
+        val inspected =
+            if (request.currentVersion != oldArtifact.currentVersion) false
+            else oldArtifact.inspected
+
         val updatedArtifact = oldArtifact.copy(
             name = request.name,
             externalLink = request.externalLink,
@@ -181,7 +186,8 @@ class ArtifactService(
             inspectorIds = request.inspectorIds,
             priority = request.priority,
             lastModification = Clock.System.now(),
-            currentVersion = request.currentVersion
+            currentVersion = request.currentVersion,
+            inspected = inspected
         )
 
         repository.replaceById(
