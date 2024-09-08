@@ -6,7 +6,7 @@ import com.julia.imp.team.member.Role
 import com.julia.imp.team.member.TeamMember
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isAdmin
-import io.ktor.server.plugins.NotFoundException
+import io.ktor.server.plugins.*
 
 class TeamService(
     private val repository: TeamRepository,
@@ -21,10 +21,12 @@ class TeamService(
     }
 
     suspend fun create(request: CreateTeamRequest, loggedUserId: String): TeamResponse {
-        val team = repository.insertAndGet(Team(
-            name = request.name,
-            defaultHourlyCost = request.defaultHourlyCost
-        ))
+        val team = repository.insertAndGet(
+            Team(
+                name = request.name,
+                defaultHourlyCost = DEFAULT_HOURLY_COST
+            )
+        )
 
         try {
             teamMemberRepository.insert(
@@ -82,4 +84,7 @@ class TeamService(
         return teamMemberRepository.isAdmin(loggedUserId, teamId)
     }
 
+    companion object {
+     private const val DEFAULT_HOURLY_COST = 15.62
+    }
 }
