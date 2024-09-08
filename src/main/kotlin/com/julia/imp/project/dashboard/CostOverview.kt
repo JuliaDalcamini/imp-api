@@ -1,4 +1,4 @@
-package com.julia.imp.dashboard
+package com.julia.imp.project.dashboard
 
 import kotlinx.serialization.Serializable
 

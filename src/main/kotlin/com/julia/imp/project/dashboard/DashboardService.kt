@@ -1,4 +1,4 @@
-package com.julia.imp.dashboard
+package com.julia.imp.project.dashboard
 
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
@@ -19,7 +19,7 @@ import com.julia.imp.question.QuestionRepository
 import com.julia.imp.question.Severity
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.*
+import io.ktor.server.plugins.NotFoundException
 import kotlin.time.Duration
 
 class DashboardService(

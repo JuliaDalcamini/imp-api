@@ -7,13 +7,13 @@ import com.julia.imp.artifact.type.ArtifactTypeService
 import com.julia.imp.auth.AuthService
 import com.julia.imp.auth.refresh.RefreshTokenRepository
 import com.julia.imp.auth.user.UserRepository
-import com.julia.imp.dashboard.DashboardService
 import com.julia.imp.defecttype.DefectTypeRepository
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.inspection.InspectionService
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.project.ProjectService
+import com.julia.imp.project.dashboard.DashboardService
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.question.QuestionService
 import com.julia.imp.team.TeamRepository

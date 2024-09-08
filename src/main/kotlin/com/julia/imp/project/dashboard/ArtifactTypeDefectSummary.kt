@@ -1,4 +1,4 @@
-package com.julia.imp.dashboard
+package com.julia.imp.project.dashboard
 
 import com.julia.imp.artifact.type.ArtifactTypeResponse
 import kotlinx.serialization.Serializable
