@@ -5,6 +5,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.toList
+import org.bson.types.ObjectId
 
 class InspectionAnswerRepository(database: MongoDatabase) : CrudRepository<InspectionAnswer>() {
 
@@ -14,4 +15,7 @@ class InspectionAnswerRepository(database: MongoDatabase) : CrudRepository<Inspe
         collection
             .find(Filters.eq("inspectionId", inspectionId))
             .toList()
+
+    suspend fun findByInspectionId(inspectionId: ObjectId): List<InspectionAnswer> =
+        findByInspectionId(inspectionId.toString())
 }

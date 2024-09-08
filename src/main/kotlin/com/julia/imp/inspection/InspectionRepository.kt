@@ -6,6 +6,7 @@ import com.mongodb.client.model.Sorts
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.toList
+import org.bson.types.ObjectId
 
 class InspectionRepository(database: MongoDatabase) : CrudRepository<Inspection>() {
 
@@ -16,4 +17,7 @@ class InspectionRepository(database: MongoDatabase) : CrudRepository<Inspection>
             .find(Filters.and(Filters.eq("artifactId", artifactId)))
             .sort(Sorts.descending("createdAt"))
             .toList()
+
+    suspend fun findByArtifactId(artifactId: ObjectId): List<Inspection> =
+        findByArtifactId(artifactId.toString())
 }

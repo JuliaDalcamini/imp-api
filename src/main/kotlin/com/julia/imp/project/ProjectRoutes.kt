@@ -49,13 +49,13 @@ fun Route.projectRoutes() {
             }
 
             patch("{id}") {
-                service.update(
+                val project = service.update(
                     projectId = call.parameters["id"] ?: throw BadRequestException("Missing project ID"),
                     request = call.receive<UpdateProjectRequest>(),
                     loggedUserId = call.authenticatedUserId
                 )
 
-                call.respond(HttpStatusCode.NoContent)
+                call.respond(project)
             }
 
             delete("{id}") {

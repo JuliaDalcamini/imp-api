@@ -3,6 +3,7 @@ package com.julia.imp.plugins
 import com.julia.imp.artifact.artifactRoutes
 import com.julia.imp.artifact.type.artifactTypeRoutes
 import com.julia.imp.auth.authRoutes
+import com.julia.imp.dashboard.dashboardRoutes
 import com.julia.imp.inspection.inspectionRoutes
 import com.julia.imp.project.projectRoutes
 import com.julia.imp.question.questionRoutes
@@ -18,6 +19,7 @@ fun Application.configureRouting() {
         artifactRoutes()
         artifactTypeRoutes()
         projectRoutes()
+        dashboardRoutes()
         teamRoutes()
         teamMemberRoutes()
         inspectorRoutes()

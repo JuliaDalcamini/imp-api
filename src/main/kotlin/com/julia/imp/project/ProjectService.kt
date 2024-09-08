@@ -1,8 +1,11 @@
 package com.julia.imp.project
 
+import com.julia.imp.artifact.Artifact
+import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.db.error.ItemNotFoundException
 import com.julia.imp.common.networking.error.UnauthorizedError
+import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isAdmin
@@ -12,6 +15,8 @@ import kotlinx.datetime.Clock
 
 class ProjectService(
     private val repository: ProjectRepository,
+    private val artifactRepository: ArtifactRepository,
+    private val inspectionRepository: InspectionRepository,
     private val teamMemberRepository: TeamMemberRepository,
     private val userRepository: UserRepository,
     private val teamRepository: TeamRepository
@@ -78,7 +83,7 @@ class ProjectService(
         )
     }
 
-    suspend fun update(projectId: String, request: UpdateProjectRequest, loggedUserId: String) {
+    suspend fun update(projectId: String, request: UpdateProjectRequest, loggedUserId: String): ProjectResponse {
         val oldProject = repository.findById(projectId)
             ?: throw NotFoundException("Project not found")
 
@@ -86,13 +91,27 @@ class ProjectService(
             throw UnauthorizedError("Only team admins can update projects")
         }
 
-        repository.replaceById(
+        val newProject = repository.replaceByIdAndGet(
             id = oldProject.id.toString(),
             item = oldProject.copy(
                 name = request.name,
                 minInspectors = request.minInspectors,
                 targetDate = request.targetDate
             )
+        )
+
+        updateArtifactInspectionState(newProject)
+
+        val creator = userRepository.findById(newProject.creatorId)
+            ?: throw IllegalStateException("Project creator not found")
+
+        val team = teamRepository.findById(newProject.teamId)
+            ?: throw IllegalStateException("Team not found")
+
+        return ProjectResponse.of(
+            project = newProject,
+            creator = creator,
+            team = team
         )
     }
 
@@ -108,6 +127,27 @@ class ProjectService(
             repository.deleteById(projectId)
         } catch (error: ItemNotFoundException) {
             throw NotFoundException("Project not found")
+        }
+    }
+
+    private suspend fun updateArtifactInspectionState(project: Project) {
+        val artifacts = artifactRepository.findByProjectId(project.id)
+
+        artifacts.forEach { artifact ->
+            updateArtifactInspectionState(artifact, project)
+        }
+    }
+
+    private suspend fun updateArtifactInspectionState(artifact: Artifact, project: Project) {
+        val inspections = inspectionRepository.findByArtifactId(artifact.id)
+        val inspectionCount = inspections.count { it.artifactVersion == artifact.currentVersion }
+        val inspected = inspectionCount >= project.minInspectors
+
+        if (inspected && !artifact.inspected) {
+            artifactRepository.replaceById(
+                id = artifact.id,
+                item = artifact.copy(inspected = true)
+            )
         }
     }
 }

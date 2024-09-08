@@ -7,6 +7,7 @@ import com.julia.imp.artifact.type.ArtifactTypeService
 import com.julia.imp.auth.AuthService
 import com.julia.imp.auth.refresh.RefreshTokenRepository
 import com.julia.imp.auth.user.UserRepository
+import com.julia.imp.dashboard.DashboardService
 import com.julia.imp.defecttype.DefectTypeRepository
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.inspection.InspectionService
@@ -43,7 +44,7 @@ fun Application.configureDependencyInjection() {
                 single<ArtifactTypeRepository> { ArtifactTypeRepository(get()) }
                 single<ArtifactTypeService> { ArtifactTypeService(get()) }
                 single<ProjectRepository> { ProjectRepository(get()) }
-                single<ProjectService> { ProjectService(get(), get(), get(), get()) }
+                single<ProjectService> { ProjectService(get(), get(), get(), get(), get(), get()) }
                 single<TeamRepository> { TeamRepository(get()) }
                 single<TeamService> { TeamService(get(), get()) }
                 single<TeamMemberRepository> { TeamMemberRepository(get()) }
@@ -56,6 +57,7 @@ fun Application.configureDependencyInjection() {
                 single<InspectionRepository> { InspectionRepository(get()) }
                 single<InspectionService> { InspectionService(get(), get(), get(), get(), get(), get(), get(), get()) }
                 single<InspectionAnswerRepository> { InspectionAnswerRepository(get()) }
+                single<DashboardService> { DashboardService(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
             }
         )
     }

@@ -5,6 +5,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.toList
+import org.bson.types.ObjectId
 
 class ArtifactRepository(database: MongoDatabase) : CrudRepository<Artifact>() {
 
@@ -14,6 +15,9 @@ class ArtifactRepository(database: MongoDatabase) : CrudRepository<Artifact>() {
         collection
             .find(Filters.and(Filters.eq("projectId", projectId)))
             .toList()
+
+    suspend fun findByProjectId(projectId: ObjectId): List<Artifact> =
+        findByProjectId(projectId.toString())
 
     suspend fun findFiltered(projectId: String, userId: String, filter: ArtifactFilter): List<Artifact> =
         when (filter) {
