@@ -26,7 +26,7 @@ import com.julia.imp.question.Severity
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.*
+import io.ktor.server.plugins.NotFoundException
 import kotlin.time.Duration
 
 class ReportService(
@@ -187,7 +187,7 @@ class ReportService(
         inspector: UserResponse,
         projectsInspections: List<Inspection>
     ): InspectorOverview {
-        val inspectorArtifacts = artifacts.filter { it.inspectorIds.contains(inspector.id) }
+        val inspectorArtifacts = artifacts.filter { it.inspectorIds.contains(inspector.id) && !it.archived }
         val totalInspections = inspectorArtifacts.size
 
         val completedInspections = inspectorArtifacts.count { artifact ->

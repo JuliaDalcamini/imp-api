@@ -115,7 +115,7 @@ class DashboardService(
         artifacts: List<Artifact>,
         inspector: UserResponse
     ): InspectorProgress? {
-        val inspectorArtifacts = artifacts.filter { it.inspectorIds.contains(inspector.id) }
+        val inspectorArtifacts = artifacts.filter { it.inspectorIds.contains(inspector.id) && !it.archived}
         val total = inspectorArtifacts.size
 
         return if (total > 0) {
@@ -137,7 +137,7 @@ class DashboardService(
     }
 
     private fun calculateOverallProgress(artifacts: List<Artifact>): OverallProgress {
-        val inspectedArtifacts = artifacts.filter { it.inspected }
+        val inspectedArtifacts = artifacts.filter { it.inspected && !it.archived}
         val total = artifacts.size
         val percentage = percentage(inspectedArtifacts.size, artifacts.size)
 

@@ -141,6 +141,43 @@ class InspectionService(
         }
     }
 
+    suspend fun get(
+        artifactId: String,
+        inspectionId: String,
+        projectId: String,
+        loggedUserId: String
+    ): InspectionResponse {
+        if (!canViewInspections(loggedUserId, artifactId, projectId)) {
+            throw UnauthorizedError("Only team members can view inspections")
+        }
+
+        val inspection = repository.findById(inspectionId)
+            ?: throw IllegalStateException("Inspection not found")
+
+        val inspector = userRepository.findById(inspection.inspectorId)
+            ?: throw IllegalStateException("Inspector not found")
+
+        val answers = answerRepository.findByInspectionId(inspection.id.toString()).map {
+            val question = questionRepository.findById(it.questionId)
+                ?: throw IllegalStateException("Question not found")
+
+            val defectType = defectTypeRepository.findById(question.defectTypeId)
+                ?: throw IllegalStateException("Defect type not found")
+
+            InspectionAnswerResponse.of(
+                inspectionAnswer = it,
+                question = question,
+                defectType = defectType
+            )
+        }
+
+        return InspectionResponse.of(
+            inspection = inspection,
+            inspector = inspector,
+            answers = answers
+        )
+    }
+
     private suspend fun canInspectArtifact(userId: String, artifactId: String, projectId: String): Boolean {
         val artifact = artifactRepository.findById(artifactId) ?: return false
 

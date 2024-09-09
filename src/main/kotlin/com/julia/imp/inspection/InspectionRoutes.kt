@@ -18,6 +18,17 @@ fun Route.inspectionRoutes() {
 
     route("projects/{projectId}/artifacts/{artifactId}/inspections") {
         authenticate {
+            get("{id}") {
+                val inspections = service.get(
+                    artifactId = call.parameters["artifactId"] ?: throw BadRequestException("Missing artifact ID"),
+                    inspectionId = call.parameters["id"] ?: throw BadRequestException("Missing inspection ID"),
+                    projectId = call.parameters["projectId"] ?: throw BadRequestException("Missing project ID"),
+                    loggedUserId = call.authenticatedUserId
+                )
+
+                call.respond(inspections)
+            }
+
             get {
                 val inspections = service.getAll(
                     artifactId = call.parameters["artifactId"] ?: throw BadRequestException("Missing artifact ID"),
