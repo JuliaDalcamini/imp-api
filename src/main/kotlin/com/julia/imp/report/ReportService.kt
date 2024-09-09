@@ -280,11 +280,15 @@ class ReportService(
         totalCost: Double,
         all: Int
     ): Triple<Double, Double, Double> {
-        val lowSeverityCost = lowSeverity * totalCost / all
-        val mediumSeverityCost = mediumSeverity * totalCost / all
-        val highSeverityCost = highSeverity * totalCost / all
-
-        return Triple(lowSeverityCost, mediumSeverityCost, highSeverityCost)
+        return if (all > 0) {
+            Triple(
+                lowSeverity * totalCost / all,
+                mediumSeverity * totalCost / all,
+                highSeverity * totalCost / all
+            )
+        } else {
+            Triple(0.0, 0.0, 0.0)
+        }
     }
 
     private fun getEffortPerArtifact(inspections: List<Inspection>, artifactId: String): Duration =
