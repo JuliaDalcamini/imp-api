@@ -7,6 +7,8 @@ import com.julia.imp.artifact.type.ArtifactTypeResponse
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.auth.user.UserResponse
 import com.julia.imp.common.datetime.sumOfDuration
+import com.julia.imp.common.math.average
+import com.julia.imp.common.math.percentage
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.defecttype.DefectTypeRepository
 import com.julia.imp.defecttype.DefectTypeResponse
@@ -48,7 +50,7 @@ class DashboardService(
         val inspectors = getProjectInspectors(projectId)
         val artifactsWithInspections = getArtifactsWithInspections(artifacts, inspections)
 
-        val inspectorsProgress = inspectors.map { inspector ->
+        val inspectorsProgress = inspectors.mapNotNull { inspector ->
             calculateInspectorProgress(artifacts, inspector)
         }
 
@@ -87,8 +89,8 @@ class DashboardService(
 
     private fun calculateEffortOverview(artifacts: List<Artifact>, inspections: List<Inspection>): EffortOverview {
         val totalDuration = inspections.sumOfDuration { it.duration }
-        val averagePerArtifact = if (artifacts.isNotEmpty()) totalDuration / artifacts.size else Duration.ZERO
-        val averagePerInspection = if (inspections.isNotEmpty()) totalDuration / inspections.size else Duration.ZERO
+        val averagePerArtifact = average(totalDuration, artifacts.size)
+        val averagePerInspection = average(totalDuration, inspections.size)
 
         return EffortOverview(
             total = totalDuration,
@@ -99,8 +101,8 @@ class DashboardService(
 
     private fun calculateCostOverview(artifacts: List<Artifact>, inspections: List<Inspection>): CostOverview {
         val totalCost = inspections.sumOf { it.cost }
-        val averagePerArtifact = if (artifacts.isNotEmpty()) totalCost / artifacts.size else 0.0
-        val averagePerInspection = if (inspections.isNotEmpty()) totalCost / inspections.size else 0.0
+        val averagePerArtifact = average(totalCost, artifacts.size)
+        val averagePerInspection = average(totalCost, inspections.size)
 
         return CostOverview(
             total = totalCost,
@@ -112,32 +114,32 @@ class DashboardService(
     private suspend fun calculateInspectorProgress(
         artifacts: List<Artifact>,
         inspector: UserResponse
-    ): InspectorProgress {
+    ): InspectorProgress? {
         val inspectorArtifacts = artifacts.filter { it.inspectorIds.contains(inspector.id) }
         val total = inspectorArtifacts.size
 
-        val inspected = inspectorArtifacts.count { artifact ->
-            val inspection = inspectionRepository.findByArtifactId(artifact.id)
-                .filter { it.inspectorId == inspector.id }
-                .maxByOrNull { it.createdAt }
+        return if (total > 0) {
+            val inspected = inspectorArtifacts.count { artifact ->
+                val inspection = inspectionRepository.findByArtifactId(artifact.id)
+                    .filter { it.inspectorId == inspector.id }
+                    .maxByOrNull { it.createdAt }
 
-            inspection?.artifactVersion == artifact.currentVersion
-        }
+                inspection?.artifactVersion == artifact.currentVersion
+            }
 
-        val percentage = if (total > 0) inspected.toDouble() / total else 0.0
-
-        return InspectorProgress(
-            inspector = inspector,
-            percentage = percentage,
-            count = inspected,
-            total = total
-        )
+            InspectorProgress(
+                inspector = inspector,
+                percentage = inspected.toDouble() / total,
+                count = inspected,
+                total = total
+            )
+        } else null
     }
 
     private fun calculateOverallProgress(artifacts: List<Artifact>): OverallProgress {
         val inspectedArtifacts = artifacts.filter { it.inspected }
         val total = artifacts.size
-        val percentage = if (total > 0) inspectedArtifacts.size.toDouble() / artifacts.size else 0.0
+        val percentage = percentage(inspectedArtifacts.size, artifacts.size)
 
         return OverallProgress(
             percentage = percentage,
@@ -159,7 +161,7 @@ class DashboardService(
             val defectType = defectTypeRepository.findById(defectTypeId)
                 ?: throw IllegalStateException("Defect type not found")
 
-            val percentage = if (projectDefects.isNotEmpty()) defects.size.toDouble() / projectDefects.size else 0.0
+            val percentage = percentage(defects.size, projectDefects.size)
 
             DefectTypeSummary(
                 defectType = DefectTypeResponse.of(defectType),
@@ -183,7 +185,7 @@ class DashboardService(
             val artifactType = artifactTypeRepository.findById(artifactTypeId)
                 ?: throw IllegalStateException("Artifact type not found")
 
-            val percentage = if (projectDefects.isNotEmpty()) defects.size.toDouble() / projectDefects.size else 0.0
+            val percentage = percentage(defects.size, projectDefects.size)
 
             val totals = CountAndCost(
                 count = defects.size,
@@ -207,7 +209,7 @@ class DashboardService(
         cost: Double
     ): CountAndCost {
         val defectsOfSeverity = defects.filter { defect -> defect.severity == severity }
-        val severityPercentage = if (defects.isNotEmpty()) defectsOfSeverity.size.toDouble() / defects.size else 0.0
+        val severityPercentage = percentage(defectsOfSeverity.size, defects.size)
 
         return CountAndCost(
             count = defectsOfSeverity.size,
