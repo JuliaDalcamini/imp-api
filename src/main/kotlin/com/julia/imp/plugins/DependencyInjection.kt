@@ -16,6 +16,7 @@ import com.julia.imp.project.ProjectService
 import com.julia.imp.project.dashboard.DashboardService
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.question.QuestionService
+import com.julia.imp.report.ReportService
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.TeamService
 import com.julia.imp.team.inspector.InspectorService
@@ -23,8 +24,7 @@ import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.TeamMemberService
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
+import io.ktor.server.application.*
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 
@@ -58,6 +58,7 @@ fun Application.configureDependencyInjection() {
                 single<InspectionService> { InspectionService(get(), get(), get(), get(), get(), get(), get(), get()) }
                 single<InspectionAnswerRepository> { InspectionAnswerRepository(get()) }
                 single<DashboardService> { DashboardService(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+                single<ReportService> { ReportService(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
             }
         )
     }
