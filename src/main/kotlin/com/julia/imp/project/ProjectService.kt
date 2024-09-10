@@ -10,8 +10,7 @@ import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isAdmin
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.NotFoundException
-import kotlinx.datetime.Clock
+import io.ktor.server.plugins.*
 
 class ProjectService(
     private val repository: ProjectRepository,
@@ -73,7 +72,7 @@ class ProjectService(
         return repository.insert(
             Project(
                 name = request.name,
-                creationDateTime = Clock.System.now(),
+                startDate = request.startDate,
                 targetDate = request.targetDate,
                 creatorId = loggedUserId,
                 prioritizer = request.prioritizer,
@@ -96,6 +95,7 @@ class ProjectService(
             item = oldProject.copy(
                 name = request.name,
                 minInspectors = request.minInspectors,
+                startDate = request.startDate,
                 targetDate = request.targetDate
             )
         )

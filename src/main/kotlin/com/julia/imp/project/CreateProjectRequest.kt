@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateProjectRequest(
     val name: String,
+    val startDate: LocalDate,
     val targetDate: LocalDate,
     val prioritizer: Prioritizer,
     val minInspectors: Int,

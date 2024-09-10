@@ -1,7 +1,6 @@
 package com.julia.imp.project
 
 import com.julia.imp.priority.Prioritizer
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
@@ -14,7 +13,7 @@ data class Project(
     @SerialName("_id")
     val id: ObjectId = ObjectId(),
     val name: String,
-    val creationDateTime: Instant,
+    val startDate: LocalDate,
     val targetDate: LocalDate,
     val creatorId: String,
     val prioritizer: Prioritizer,
