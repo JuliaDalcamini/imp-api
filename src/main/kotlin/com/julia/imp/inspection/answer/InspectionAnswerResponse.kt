@@ -9,7 +9,8 @@ import kotlinx.serialization.Serializable
 data class InspectionAnswerResponse(
     val id: String,
     val question: QuestionResponse,
-    val answer: AnswerOption
+    val answer: AnswerOption,
+    val defectDetail: String?
 ) {
 
     companion object {
@@ -17,7 +18,8 @@ data class InspectionAnswerResponse(
         fun of(inspectionAnswer: InspectionAnswer, question: Question, defectType: DefectType) = InspectionAnswerResponse(
             id = inspectionAnswer.id.toString(),
             question = QuestionResponse.of(question, defectType),
-            answer = inspectionAnswer.answer
+            answer = inspectionAnswer.answer,
+            defectDetail = inspectionAnswer.defectDetail
         )
     }
 }

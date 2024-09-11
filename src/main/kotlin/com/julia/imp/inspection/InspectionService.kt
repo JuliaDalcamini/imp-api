@@ -14,7 +14,7 @@ import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.canInspect
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.NotFoundException
+import io.ktor.server.plugins.*
 import kotlinx.datetime.Clock
 import kotlin.time.DurationUnit
 
@@ -48,8 +48,6 @@ class InspectionService(
         val member = teamMemberRepository.findByUserIdAndTeamId(loggedUserId, project.teamId)
             ?: throw IllegalStateException("Member not found")
 
-        val oldInspection = repository.findByArtifactId(artifactId).filter { it.inspectorId == loggedUserId }
-
         val inspection = repository.insertAndGet(
             Inspection(
                 artifactId = artifactId,
@@ -61,16 +59,17 @@ class InspectionService(
             )
         )
 
-        val answers = request.answers.entries.map { pair ->
+        val answers = request.answers.map { answerRequest ->
             val answer = answerRepository.insertAndGet(
                 InspectionAnswer(
                     inspectionId = inspection.id.toString(),
-                    questionId = pair.key,
-                    answer = pair.value
+                    questionId = answerRequest.questionId,
+                    answer = answerRequest.answer,
+                    defectDetail = answerRequest.defectDetail
                 )
             )
 
-            val question = questionRepository.findById(pair.key)
+            val question = questionRepository.findById(answerRequest.questionId)
                 ?: throw IllegalStateException("Question not found")
 
             val defectType = defectTypeRepository.findById(question.defectTypeId)
