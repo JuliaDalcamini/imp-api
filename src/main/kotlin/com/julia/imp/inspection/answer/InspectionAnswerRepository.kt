@@ -18,4 +18,9 @@ class InspectionAnswerRepository(database: MongoDatabase) : CrudRepository<Inspe
 
     suspend fun findByInspectionId(inspectionId: ObjectId): List<InspectionAnswer> =
         findByInspectionId(inspectionId.toString())
+
+    suspend fun deleteAllByInspectionId(id: String): Long {
+        val result = collection.deleteMany(Filters.eq("inspectionId", id))
+        return result.deletedCount
+    }
 }

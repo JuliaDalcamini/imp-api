@@ -20,4 +20,9 @@ class InspectionRepository(database: MongoDatabase) : CrudRepository<Inspection>
 
     suspend fun findByArtifactId(artifactId: ObjectId): List<Inspection> =
         findByArtifactId(artifactId.toString())
+
+    suspend fun deleteAllByArtifactId(id: String): Long {
+        val result = collection.deleteMany(Filters.eq("artifactId", id))
+        return result.deletedCount
+    }
 }

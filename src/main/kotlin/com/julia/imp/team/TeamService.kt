@@ -1,15 +1,23 @@
 package com.julia.imp.team
 
+import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.common.db.error.ItemNotFoundException
 import com.julia.imp.common.networking.error.UnauthorizedError
+import com.julia.imp.inspection.InspectionRepository
+import com.julia.imp.inspection.answer.InspectionAnswerRepository
+import com.julia.imp.project.ProjectRepository
 import com.julia.imp.team.member.Role
 import com.julia.imp.team.member.TeamMember
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isAdmin
-import io.ktor.server.plugins.*
+import io.ktor.server.plugins.NotFoundException
 
 class TeamService(
     private val repository: TeamRepository,
+    private val inspectionAnswerRepository: InspectionAnswerRepository,
+    private val inspectionRepository: InspectionRepository,
+    private val artifactRepository: ArtifactRepository,
+    private val projectRepository: ProjectRepository,
     private val teamMemberRepository: TeamMemberRepository
 ) {
 
@@ -71,6 +79,25 @@ class TeamService(
             throw UnauthorizedError("Only team admins can delete teams")
         }
 
+        val projects = projectRepository.findByTeamId(teamId)
+
+        projects.forEach { project ->
+            val artifacts = artifactRepository.findByProjectId(project.id.toString())
+
+            artifacts.forEach { artifact ->
+                val inspections = inspectionRepository.findByArtifactId(artifact.id)
+
+                inspections.forEach { inspection ->
+                    inspectionAnswerRepository.deleteAllByInspectionId(inspection.id.toString())
+                }
+
+                inspectionRepository.deleteAllByArtifactId(artifact.id.toString())
+            }
+
+            artifactRepository.deleteAllByProjectId(project.id.toString())
+        }
+
+        projectRepository.deleteAllByTeamId(teamId)
         teamMemberRepository.deleteByTeamId(teamId)
 
         try {
@@ -85,6 +112,6 @@ class TeamService(
     }
 
     companion object {
-     private const val DEFAULT_HOURLY_COST = 15.62
+        private const val DEFAULT_HOURLY_COST = 15.62
     }
 }

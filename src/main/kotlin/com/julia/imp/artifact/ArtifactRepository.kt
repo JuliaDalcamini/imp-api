@@ -70,4 +70,9 @@ class ArtifactRepository(database: MongoDatabase) : CrudRepository<Artifact>() {
                 )
             )
             .toList()
+
+    suspend fun deleteAllByProjectId(id: String): Long {
+        val result = collection.deleteMany(Filters.eq("projectId", id))
+        return result.deletedCount
+    }
 }

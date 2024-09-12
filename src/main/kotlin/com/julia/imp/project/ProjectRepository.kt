@@ -14,4 +14,9 @@ class ProjectRepository(database: MongoDatabase) : CrudRepository<Project>() {
         collection
             .find(Filters.and(Filters.eq("teamId", teamId)))
             .toList()
+
+    suspend fun deleteAllByTeamId(id: String): Long {
+        val result = collection.deleteMany(Filters.eq("teamId", id))
+        return result.deletedCount
+    }
 }
