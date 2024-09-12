@@ -15,6 +15,33 @@ class ProjectRepository(database: MongoDatabase) : CrudRepository<Project>() {
             .find(Filters.and(Filters.eq("teamId", teamId)))
             .toList()
 
+    suspend fun findFiltered(teamId: String, filter: ProjectFilter) =
+        when (filter) {
+            ProjectFilter.Active -> findActiveByTeamId(teamId)
+            ProjectFilter.Finished -> findFinishedByTeamId(teamId)
+            ProjectFilter.All -> findByTeamId(teamId)
+        }
+
+    private suspend fun findActiveByTeamId(teamId: String): List<Project> =
+        collection
+            .find(
+                Filters.and(
+                    Filters.eq("teamId", teamId),
+                    Filters.ne("finished", true)
+                )
+            )
+            .toList()
+
+    private suspend fun findFinishedByTeamId(teamId: String): List<Project> =
+        collection
+            .find(
+                Filters.and(
+                    Filters.eq("teamId", teamId),
+                    Filters.eq("finished", true)
+                )
+            )
+            .toList()
+
     suspend fun deleteAllByTeamId(id: String): Long {
         val result = collection.deleteMany(Filters.eq("teamId", id))
         return result.deletedCount

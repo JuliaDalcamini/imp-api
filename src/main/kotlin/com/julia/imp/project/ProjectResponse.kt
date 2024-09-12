@@ -17,7 +17,8 @@ data class ProjectResponse(
     val creator: UserResponse,
     val prioritizer: Prioritizer,
     val minInspectors: Int,
-    val team: TeamResponse
+    val team: TeamResponse,
+    val finished: Boolean
 ) {
 
     companion object {
@@ -30,7 +31,8 @@ data class ProjectResponse(
             creator = UserResponse.of(creator),
             prioritizer = project.prioritizer,
             minInspectors = project.minInspectors,
-            team = TeamResponse.of(team)
+            team = TeamResponse.of(team),
+            finished = project.finished
         )
     }
 }

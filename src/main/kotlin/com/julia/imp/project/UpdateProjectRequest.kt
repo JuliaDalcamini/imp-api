@@ -8,5 +8,6 @@ data class UpdateProjectRequest(
     val name: String,
     val minInspectors: Int,
     val startDate: LocalDate,
-    val targetDate: LocalDate
+    val targetDate: LocalDate,
+    val finished: Boolean
 )

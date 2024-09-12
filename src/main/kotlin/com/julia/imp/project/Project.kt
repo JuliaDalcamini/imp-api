@@ -18,5 +18,6 @@ data class Project(
     val creatorId: String,
     val prioritizer: Prioritizer,
     val minInspectors: Int,
-    val teamId: String
+    val teamId: String,
+    val finished: Boolean
 )

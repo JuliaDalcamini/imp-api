@@ -24,7 +24,8 @@ fun Route.projectRoutes() {
             get {
                 val projects = service.getAll(
                     teamId = call.query["teamId"] ?: throw BadRequestException("Missing team ID"),
-                    loggedUserId = call.authenticatedUserId
+                    loggedUserId = call.authenticatedUserId,
+                    filter = call.query["filter"]?.let { ProjectFilter.fromString(it) } ?: ProjectFilter.All
                 )
 
                 call.respond(projects)

@@ -4,13 +4,14 @@ import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.db.error.ItemNotFoundException
+import com.julia.imp.common.networking.error.ForbiddenError
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isAdmin
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.*
+import io.ktor.server.plugins.NotFoundException
 
 class ProjectService(
     private val repository: ProjectRepository,
@@ -21,7 +22,7 @@ class ProjectService(
     private val teamRepository: TeamRepository
 ) {
 
-    suspend fun getAll(teamId: String, loggedUserId: String): List<ProjectResponse> {
+    suspend fun getAll(teamId: String, loggedUserId: String, filter: ProjectFilter): List<ProjectResponse> {
         if (!teamMemberRepository.isMember(loggedUserId, teamId)) {
             throw UnauthorizedError("Only team members can see its projects")
         }
@@ -29,7 +30,7 @@ class ProjectService(
         val team = teamRepository.findById(teamId)
             ?: throw NotFoundException("Team not found")
 
-        val projects = repository.findByTeamId(teamId)
+        val projects = repository.findFiltered(teamId, filter)
 
         return projects.map { project ->
             val creator = userRepository.findById(project.creatorId)
@@ -77,7 +78,8 @@ class ProjectService(
                 creatorId = loggedUserId,
                 prioritizer = request.prioritizer,
                 minInspectors = request.minInspectors,
-                teamId = request.teamId
+                teamId = request.teamId,
+                finished = false
             )
         )
     }
@@ -90,13 +92,18 @@ class ProjectService(
             throw UnauthorizedError("Only team admins can update projects")
         }
 
+        if (oldProject.finished) {
+            throw ForbiddenError("Can't update finished project")
+        }
+
         val newProject = repository.replaceByIdAndGet(
             id = oldProject.id.toString(),
             item = oldProject.copy(
                 name = request.name,
                 minInspectors = request.minInspectors,
                 startDate = request.startDate,
-                targetDate = request.targetDate
+                targetDate = request.targetDate,
+                finished = request.finished
             )
         )
 
