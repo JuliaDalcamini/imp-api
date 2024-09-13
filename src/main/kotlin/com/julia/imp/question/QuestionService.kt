@@ -11,13 +11,7 @@ class QuestionService(
         val questions = repository.findByArtifactTypeId(artifactTypeId)
 
         return questions.map { question ->
-            val defectType = defectTypeRepository.findById(question.defectTypeId)
-                ?: throw IllegalStateException("Defect type not found")
-
-            QuestionResponse.of(
-                question = question,
-                defectType = defectType
-            )
+            QuestionResponse.of(question)
         }
     }
 }

@@ -149,7 +149,7 @@ class DashboardService(
     }
 
     private suspend fun calculateDefectsByDefectType(
-        projectDefects: List<Defect>,
+        projectDefects: List<DashboardDefect>,
         projectCost: Double,
         projectEffort: Duration
     ): List<DefectTypeSummary> {
@@ -174,7 +174,7 @@ class DashboardService(
     }
 
     private suspend fun calculateDefectsByArtifactType(
-        projectDefects: List<Defect>,
+        projectDefects: List<DashboardDefect>,
         projectCost: Double
     ): List<ArtifactTypeDefectSummary> {
         val defectsByArtifactType = projectDefects.groupBy { it.artifactTypeId }
@@ -205,7 +205,7 @@ class DashboardService(
 
     private fun calculateCountAndCostForSeverity(
         severity: Severity,
-        defects: List<Defect>,
+        defects: List<DashboardDefect>,
         cost: Double
     ): CountAndCost {
         val defectsOfSeverity = defects.filter { defect -> defect.severity == severity }
@@ -217,15 +217,15 @@ class DashboardService(
         )
     }
 
-    private suspend fun getDefects(inspections: List<Inspection>): List<Defect> {
+    private suspend fun getDefects(inspections: List<Inspection>): List<DashboardDefect> {
         val answers = inspections.flatMap { inspection -> inspectionAnswerRepository.findByInspectionId(inspection.id) }
-        val negativeAnswers = answers.filter { it.answer == AnswerOption.No }
+        val negativeAnswers = answers.filter { it.answerOption == AnswerOption.No }
 
         return negativeAnswers.map { answer ->
             val question = questionRepository.findById(answer.questionId)
                 ?: throw IllegalStateException("Question not found")
 
-            Defect(
+            DashboardDefect(
                 defectTypeId = question.defectTypeId,
                 artifactTypeId = question.artifactTypeId,
                 severity = question.severity

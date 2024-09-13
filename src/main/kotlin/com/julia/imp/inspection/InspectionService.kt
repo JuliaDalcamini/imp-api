@@ -4,7 +4,10 @@ import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.networking.error.UnauthorizedError
+import com.julia.imp.defect.Defect
+import com.julia.imp.defect.DefectRepository
 import com.julia.imp.defecttype.DefectTypeRepository
+import com.julia.imp.inspection.answer.AnswerOption
 import com.julia.imp.inspection.answer.InspectionAnswer
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.inspection.answer.InspectionAnswerResponse
@@ -14,7 +17,7 @@ import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.canInspect
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.*
+import io.ktor.server.plugins.NotFoundException
 import kotlinx.datetime.Clock
 import kotlin.time.DurationUnit
 
@@ -26,7 +29,8 @@ class InspectionService(
     private val defectTypeRepository: DefectTypeRepository,
     private val projectRepository: ProjectRepository,
     private val teamMemberRepository: TeamMemberRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val defectRepository: DefectRepository
 ) {
 
     suspend fun create(
@@ -60,24 +64,38 @@ class InspectionService(
         )
 
         val answers = request.answers.map { answerRequest ->
-            val answer = answerRepository.insertAndGet(
-                InspectionAnswer(
-                    inspectionId = inspection.id.toString(),
-                    questionId = answerRequest.questionId,
-                    answer = answerRequest.answer,
-                    defectDetail = answerRequest.defectDetail
-                )
-            )
-
             val question = questionRepository.findById(answerRequest.questionId)
                 ?: throw IllegalStateException("Question not found")
 
             val defectType = defectTypeRepository.findById(question.defectTypeId)
                 ?: throw IllegalStateException("Defect type not found")
 
+            val answer = answerRepository.insertAndGet(
+                InspectionAnswer(
+                    inspectionId = inspection.id.toString(),
+                    questionId = answerRequest.questionId,
+                    answerOption = answerRequest.answer
+                )
+            )
+
+            val defect = if (answerRequest.answer == AnswerOption.No) {
+                defectRepository.insertAndGet(
+                    Defect(
+                        artifactId = artifactId,
+                        defectTypeId = defectType.id.toString(),
+                        answerId = answer.id.toString(),
+                        severity = question.severity,
+                        description = answerRequest.defectDescription,
+                        fixed = false
+                    )
+                )
+            } else null
+
             InspectionAnswerResponse.of(
                 inspectionAnswer = answer,
                 question = question,
+                artifact = artifact,
+                defect = defect,
                 defectType = defectType
             )
         }
@@ -112,22 +130,31 @@ class InspectionService(
             throw UnauthorizedError("Only team members can view inspections")
         }
 
+        val artifact = artifactRepository.findById(artifactId)
+            ?: throw NotFoundException("Artifact not found")
+
         val inspections = repository.findByArtifactId(artifactId)
 
         return inspections.map { inspection ->
             val inspector = userRepository.findById(inspection.inspectorId)
                 ?: throw IllegalStateException("Inspector not found")
 
-            val answers = answerRepository.findByInspectionId(inspection.id.toString()).map {
-                val question = questionRepository.findById(it.questionId)
+            val answers = answerRepository.findByInspectionId(inspection.id.toString()).map { answer ->
+                val question = questionRepository.findById(answer.questionId)
                     ?: throw IllegalStateException("Question not found")
 
-                val defectType = defectTypeRepository.findById(question.defectTypeId)
-                    ?: throw IllegalStateException("Defect type not found")
+                val defect = defectRepository.findByAnswerId(answer.id)
+
+                val defectType = defect?.let {
+                    defectTypeRepository.findById(defect.defectTypeId)
+                        ?: throw IllegalStateException("Defect type not found")
+                }
 
                 InspectionAnswerResponse.of(
-                    inspectionAnswer = it,
+                    inspectionAnswer = answer,
                     question = question,
+                    artifact = artifact,
+                    defect = defect,
                     defectType = defectType
                 )
             }
@@ -150,22 +177,31 @@ class InspectionService(
             throw UnauthorizedError("Only team members can view inspections")
         }
 
+        val artifact = artifactRepository.findById(artifactId)
+            ?: throw NotFoundException("Artifact not found")
+
         val inspection = repository.findById(inspectionId)
-            ?: throw IllegalStateException("Inspection not found")
+            ?: throw NotFoundException("Inspection not found")
 
         val inspector = userRepository.findById(inspection.inspectorId)
             ?: throw IllegalStateException("Inspector not found")
 
-        val answers = answerRepository.findByInspectionId(inspection.id.toString()).map {
-            val question = questionRepository.findById(it.questionId)
+        val answers = answerRepository.findByInspectionId(inspection.id.toString()).map { answer ->
+            val question = questionRepository.findById(answer.questionId)
                 ?: throw IllegalStateException("Question not found")
 
-            val defectType = defectTypeRepository.findById(question.defectTypeId)
-                ?: throw IllegalStateException("Defect type not found")
+            val defect = defectRepository.findByAnswerId(answer.id)
+
+            val defectType = defect?.let {
+                defectTypeRepository.findById(defect.defectTypeId)
+                    ?: throw IllegalStateException("Defect type not found")
+            }
 
             InspectionAnswerResponse.of(
-                inspectionAnswer = it,
+                inspectionAnswer = answer,
                 question = question,
+                artifact = artifact,
+                defect = defect,
                 defectType = defectType
             )
         }

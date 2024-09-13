@@ -20,7 +20,7 @@ import com.julia.imp.inspection.answer.AnswerOption
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.project.ProjectResponse
-import com.julia.imp.project.dashboard.Defect
+import com.julia.imp.project.dashboard.DashboardDefect
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.question.Severity
 import com.julia.imp.team.TeamRepository
@@ -109,17 +109,17 @@ class ReportService(
         )
     }
 
-    private suspend fun getDefects(inspections: List<Inspection>): List<Defect> {
+    private suspend fun getDefects(inspections: List<Inspection>): List<DashboardDefect> {
         val answers = inspections.flatMap { inspection ->
             inspectionAnswerRepository.findByInspectionId(inspection.id)
         }
-        val negativeAnswers = answers.filter { it.answer == AnswerOption.No }
+        val negativeAnswers = answers.filter { it.answerOption == AnswerOption.No }
 
         return negativeAnswers.map { answer ->
             val question = questionRepository.findById(answer.questionId)
                 ?: throw IllegalStateException("Question not found")
 
-            Defect(
+            DashboardDefect(
                 defectTypeId = question.defectTypeId,
                 artifactTypeId = question.artifactTypeId,
                 severity = question.severity
@@ -259,7 +259,7 @@ class ReportService(
     }
 
     private fun calculateSeverities(
-        defectsOfArtifactType: List<Defect>,
+        defectsOfArtifactType: List<DashboardDefect>,
         weighted: Boolean
     ): Triple<Int, Int, Int> {
         val lowSeverity = defectsOfArtifactType.count { it.severity == Severity.Low }

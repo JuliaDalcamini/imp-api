@@ -7,6 +7,8 @@ import com.julia.imp.artifact.type.ArtifactTypeService
 import com.julia.imp.auth.AuthService
 import com.julia.imp.auth.refresh.RefreshTokenRepository
 import com.julia.imp.auth.user.UserRepository
+import com.julia.imp.defect.DefectRepository
+import com.julia.imp.defect.DefectService
 import com.julia.imp.defecttype.DefectTypeRepository
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.inspection.InspectionService
@@ -56,10 +58,49 @@ fun Application.configureDependencyInjection() {
                 single<QuestionRepository> { QuestionRepository(get()) }
                 single<QuestionService> { QuestionService(get(), get()) }
                 single<InspectionRepository> { InspectionRepository(get()) }
-                single<InspectionService> { InspectionService(get(), get(), get(), get(), get(), get(), get(), get()) }
+                single<InspectionService> {
+                    InspectionService(
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get()
+                    )
+                }
                 single<InspectionAnswerRepository> { InspectionAnswerRepository(get()) }
-                single<DashboardService> { DashboardService(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-                single<ReportService> { ReportService(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+                single<DashboardService> {
+                    DashboardService(
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get()
+                    )
+                }
+                single<ReportService> {
+                    ReportService(
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get(),
+                        get()
+                    )
+                }
+                single<DefectRepository> { DefectRepository(get()) }
+                single<DefectService> { DefectService(get(), get(), get(), get(), get()) }
             }
         )
     }

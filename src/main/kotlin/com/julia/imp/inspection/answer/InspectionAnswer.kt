@@ -12,6 +12,5 @@ data class InspectionAnswer(
     val id: ObjectId = ObjectId(),
     val inspectionId: String,
     val questionId: String,
-    val answer: AnswerOption,
-    val defectDetail: String?
+    val answerOption: AnswerOption
 )
