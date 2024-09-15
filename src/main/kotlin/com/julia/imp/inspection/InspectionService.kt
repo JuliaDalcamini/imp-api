@@ -82,8 +82,9 @@ class InspectionService(
                 defectRepository.insertAndGet(
                     Defect(
                         artifactId = artifactId,
-                        defectTypeId = defectType.id.toString(),
+                        projectId = projectId,
                         answerId = answer.id.toString(),
+                        defectTypeId = defectType.id.toString(),
                         severity = question.severity,
                         description = answerRequest.defectDescription,
                         fixed = false

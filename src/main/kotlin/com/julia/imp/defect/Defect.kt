@@ -12,8 +12,9 @@ data class Defect(
     @SerialName("_id")
     val id: ObjectId = ObjectId(),
     val artifactId: String,
-    val defectTypeId: String,
+    val projectId: String,
     val answerId: String,
+    val defectTypeId: String,
     val severity: Severity,
     val description: String?,
     val fixed: Boolean
