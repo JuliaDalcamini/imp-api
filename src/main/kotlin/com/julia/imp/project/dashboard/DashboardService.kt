@@ -53,19 +53,45 @@ class DashboardService(
             calculateInspectorProgress(artifacts, inspector)
         }
 
+        val inspectionProgress = calculateInspectionProgress(artifacts)
+        val defectsProgress = calculateDefectsProgress(defects)
         val effortOverview = calculateEffortOverview(artifactsWithInspections, inspections)
         val costOverview = calculateCostOverview(artifactsWithInspections, inspections)
-        val overallProgress = calculateOverallProgress(artifacts)
         val defectsByArtifactType = calculateDefectsByArtifactType(defects, artifacts, costOverview.total)
         val defectsByDefectType = calculateDefectsByDefectType(defects, costOverview.total, effortOverview.total)
 
         return DashboardResponse(
-            overallProgress = overallProgress,
+            inspectionProgress = inspectionProgress,
+            defectsProgress = defectsProgress,
             effortOverview = effortOverview,
             costOverview = costOverview,
-            inspectorProgress = inspectorsProgress,
+            inspectorsProgress = inspectorsProgress,
             artifactTypes = defectsByArtifactType,
-            defectsTypes = defectsByDefectType
+            defectTypes = defectsByDefectType
+        )
+    }
+
+    private fun calculateInspectionProgress(artifacts: List<Artifact>): Progress {
+        val inspectedArtifacts = artifacts.filter { it.inspected && !it.archived }
+        val total = artifacts.size
+        val percentage = percentage(inspectedArtifacts.size, artifacts.size)
+
+        return Progress(
+            percentage = percentage,
+            count = inspectedArtifacts.size,
+            total = total
+        )
+    }
+
+    private fun calculateDefectsProgress(defects: List<Defect>): Progress {
+        val fixedDefects = defects.filter { it.fixed }
+        val total = defects.size
+        val percentage = percentage(fixedDefects.size, defects.size)
+
+        return Progress(
+            percentage = percentage,
+            count = fixedDefects.size,
+            total = total
         )
     }
 
@@ -139,18 +165,6 @@ class DashboardService(
                 total = total
             )
         } else null
-    }
-
-    private fun calculateOverallProgress(artifacts: List<Artifact>): OverallProgress {
-        val inspectedArtifacts = artifacts.filter { it.inspected && !it.archived}
-        val total = artifacts.size
-        val percentage = percentage(inspectedArtifacts.size, artifacts.size)
-
-        return OverallProgress(
-            percentage = percentage,
-            count = inspectedArtifacts.size,
-            total = total
-        )
     }
 
     private suspend fun calculateDefectsByDefectType(

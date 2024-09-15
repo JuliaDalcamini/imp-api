@@ -98,7 +98,7 @@ class AuthService(
     }
 
     companion object {
-        private const val ACCESS_TOKEN_LIFETIME = 1800000L
+        private const val ACCESS_TOKEN_LIFETIME = 18000L
         private const val REFRESH_TOKEN_LIFETIME = 86400000L
         private const val PASSWORD_HASHING_ROUNDS = 12
     }

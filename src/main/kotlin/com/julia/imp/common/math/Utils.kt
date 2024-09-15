@@ -12,6 +12,8 @@ fun average(total: Duration, count: Int): Duration =
     if (count > 0) total / count else Duration.ZERO
 
 fun standardDeviation(values: List<Double>): Double {
+    if (values.isEmpty()) return 0.0
+
     val mean = values.average()
     val variance = values.map { (it - mean).pow(2) }.average()
 
@@ -19,6 +21,8 @@ fun standardDeviation(values: List<Double>): Double {
 }
 
 fun standardDeviation(values: List<Duration>): Duration {
+    if (values.isEmpty()) return Duration.ZERO
+
     val valuesInMillis = values.map { it.inWholeMilliseconds }
     val mean = valuesInMillis.average()
     val variance = valuesInMillis.map { (it - mean).pow(2) }.average()
