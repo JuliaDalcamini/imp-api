@@ -22,7 +22,8 @@ data class ArtifactResponse(
     val calculatedPriority: Double?,
     val lastModification: Instant,
     val currentVersion: String,
-    val totalCost: Double
+    val totalCost: Double,
+    val fullyInspected: Boolean
 ) {
 
     companion object {
@@ -40,7 +41,8 @@ data class ArtifactResponse(
                 calculatedPriority = prioritizer.calculatePriority(artifact.priority),
                 lastModification = artifact.lastModification,
                 currentVersion = artifact.currentVersion,
-                totalCost = totalCost
+                totalCost = totalCost,
+                fullyInspected = artifact.inspected
             )
     }
 }
