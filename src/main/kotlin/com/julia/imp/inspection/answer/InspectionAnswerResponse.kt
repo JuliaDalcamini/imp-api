@@ -32,7 +32,8 @@ data class InspectionAnswerResponse(
                 DefectResponse.of(
                     defect = defect,
                     defectType = defectType ?: throw IllegalArgumentException("Defect type is missing"),
-                    artifact = artifact
+                    artifact = artifact,
+                    question = question
                 )
             }
         )

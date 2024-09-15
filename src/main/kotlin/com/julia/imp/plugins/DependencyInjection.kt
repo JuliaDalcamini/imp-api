@@ -58,7 +58,7 @@ fun Application.configureDependencyInjection() {
                 single<QuestionService> { QuestionService(get()) }
                 single<DashboardService> { DashboardService(get(), get(), get(), get(), get(), get(), get(), get()) }
                 single<DefectRepository> { DefectRepository(get()) }
-                single<DefectService> { DefectService(get(), get(), get(), get(), get()) }
+                single<DefectService> { DefectService(get(), get(), get(), get(), get(), get(), get()) }
                 single<InspectionRepository> { InspectionRepository(get()) }
                 single<InspectionAnswerRepository> { InspectionAnswerRepository(get()) }
 

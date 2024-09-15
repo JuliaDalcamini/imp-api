@@ -3,7 +3,9 @@ package com.julia.imp.defect
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.defecttype.DefectTypeRepository
+import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.project.ProjectRepository
+import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isMember
 
@@ -12,6 +14,8 @@ class DefectService(
     private val defectTypeRepository: DefectTypeRepository,
     private val projectRepository: ProjectRepository,
     private val artifactRepository: ArtifactRepository,
+    private val inspectionAnswerRepository: InspectionAnswerRepository,
+    private val questionRepository: QuestionRepository,
     private val teamMemberRepository: TeamMemberRepository
 ) {
 
@@ -40,10 +44,17 @@ class DefectService(
             val type = defectTypeRepository.findById(defect.defectTypeId)
                 ?: throw IllegalStateException("Defect type not found")
 
+            val answer = inspectionAnswerRepository.findById(defect.answerId)
+                ?: throw IllegalStateException("Answer not found")
+
+            val question = questionRepository.findById(answer.questionId)
+                ?: throw IllegalStateException("Question not found")
+
             DefectResponse.of(
                 defect = defect,
                 defectType = type,
-                artifact = artifact
+                artifact = artifact,
+                question = question
             )
         }
     }
