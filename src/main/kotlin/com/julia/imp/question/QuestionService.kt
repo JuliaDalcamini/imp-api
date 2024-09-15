@@ -1,10 +1,7 @@
 package com.julia.imp.question
 
-import com.julia.imp.defecttype.DefectTypeRepository
-
 class QuestionService(
-    private val repository: QuestionRepository,
-    private val defectTypeRepository: DefectTypeRepository
+    private val repository: QuestionRepository
 ) {
 
     suspend fun getAll(artifactTypeId: String): List<QuestionResponse> {

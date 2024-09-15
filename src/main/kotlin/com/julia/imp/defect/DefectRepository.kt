@@ -19,11 +19,6 @@ class DefectRepository(database: MongoDatabase) : CrudRepository<Defect>() {
     suspend fun findByAnswerId(answerId: ObjectId): Defect? =
         findByAnswerId(answerId.toString()).firstOrNull()
 
-    suspend fun findByArtifactId(artifactId: String): List<Defect> =
-        collection
-            .find(Filters.and(Filters.eq("artifactId", artifactId)))
-            .toList()
-
     suspend fun findByProjectId(projectId: String): List<Defect> =
         collection
             .find(Filters.and(Filters.eq("projectId", projectId)))

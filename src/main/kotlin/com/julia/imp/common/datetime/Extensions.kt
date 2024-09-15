@@ -12,5 +12,4 @@ inline fun <T> Iterable<T>.sumOfDuration(selector: (T) -> Duration): Duration =
 /**
  * Sum all durations in the iterable.
  */
-fun Iterable<Duration>.sumOfDuration(): Duration =
-    this.sumOf { it.inWholeMilliseconds }.milliseconds
+fun Iterable<Duration>.sumOfDuration(): Duration = this.sumOfDuration { it }

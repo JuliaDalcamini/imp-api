@@ -1,7 +1,6 @@
 package com.julia.imp.artifact
 
 import com.julia.imp.priority.Priority
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
