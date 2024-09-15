@@ -9,15 +9,15 @@ import com.julia.imp.auth.user.UserResponse
 import com.julia.imp.common.datetime.sumOfDuration
 import com.julia.imp.common.math.average
 import com.julia.imp.common.math.percentage
+import com.julia.imp.common.math.standardDeviation
 import com.julia.imp.common.networking.error.UnauthorizedError
+import com.julia.imp.defect.Defect
+import com.julia.imp.defect.DefectRepository
 import com.julia.imp.defecttype.DefectTypeRepository
 import com.julia.imp.defecttype.DefectTypeResponse
 import com.julia.imp.inspection.Inspection
 import com.julia.imp.inspection.InspectionRepository
-import com.julia.imp.inspection.answer.AnswerOption
-import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.project.ProjectRepository
-import com.julia.imp.question.QuestionRepository
 import com.julia.imp.question.Severity
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isMember
@@ -30,8 +30,7 @@ class DashboardService(
     private val projectRepository: ProjectRepository,
     private val artifactRepository: ArtifactRepository,
     private val inspectionRepository: InspectionRepository,
-    private val inspectionAnswerRepository: InspectionAnswerRepository,
-    private val questionRepository: QuestionRepository,
+    private val defectRepository: DefectRepository,
     private val artifactTypeRepository: ArtifactTypeRepository,
     private val defectTypeRepository: DefectTypeRepository
 ) {
@@ -45,8 +44,8 @@ class DashboardService(
         }
 
         val artifacts = artifactRepository.findByProjectId(projectId)
+        val defects = defectRepository.findByProjectId(projectId)
         val inspections = artifacts.flatMap { inspectionRepository.findByArtifactId(it.id) }
-        val defects = getDefects(inspections)
         val inspectors = getProjectInspectors(projectId)
         val artifactsWithInspections = getArtifactsWithInspections(artifacts, inspections)
 
@@ -57,7 +56,7 @@ class DashboardService(
         val effortOverview = calculateEffortOverview(artifactsWithInspections, inspections)
         val costOverview = calculateCostOverview(artifactsWithInspections, inspections)
         val overallProgress = calculateOverallProgress(artifacts)
-        val defectsByArtifactType = calculateDefectsByArtifactType(defects, costOverview.total)
+        val defectsByArtifactType = calculateDefectsByArtifactType(defects, artifacts, costOverview.total)
         val defectsByDefectType = calculateDefectsByDefectType(defects, costOverview.total, effortOverview.total)
 
         return DashboardResponse(
@@ -88,26 +87,32 @@ class DashboardService(
     }
 
     private fun calculateEffortOverview(artifacts: List<Artifact>, inspections: List<Inspection>): EffortOverview {
-        val totalDuration = inspections.sumOfDuration { it.duration }
+        val durations = inspections.map { it.duration }
+        val totalDuration = durations.sumOfDuration()
         val averagePerArtifact = average(totalDuration, artifacts.size)
         val averagePerInspection = average(totalDuration, inspections.size)
+        val standardDeviationPerInspection = durations.standardDeviation()
 
         return EffortOverview(
             total = totalDuration,
             averagePerArtifact = averagePerArtifact,
-            averagePerInspection = averagePerInspection
+            averagePerInspection = averagePerInspection,
+            standardDeviationPerInspection = standardDeviationPerInspection
         )
     }
 
     private fun calculateCostOverview(artifacts: List<Artifact>, inspections: List<Inspection>): CostOverview {
-        val totalCost = inspections.sumOf { it.cost }
+        val costs = inspections.map { it.cost }
+        val totalCost = costs.sum()
         val averagePerArtifact = average(totalCost, artifacts.size)
         val averagePerInspection = average(totalCost, inspections.size)
+        val standardDeviationPerInspection = costs.standardDeviation()
 
         return CostOverview(
             total = totalCost,
             averagePerArtifact = averagePerArtifact,
-            averagePerInspection = averagePerInspection
+            averagePerInspection = averagePerInspection,
+            standardDeviationPerInspection = standardDeviationPerInspection
         )
     }
 
@@ -149,7 +154,7 @@ class DashboardService(
     }
 
     private suspend fun calculateDefectsByDefectType(
-        projectDefects: List<DashboardDefect>,
+        projectDefects: List<Defect>,
         projectCost: Double,
         projectEffort: Duration
     ): List<DefectTypeSummary> {
@@ -174,10 +179,16 @@ class DashboardService(
     }
 
     private suspend fun calculateDefectsByArtifactType(
-        projectDefects: List<DashboardDefect>,
+        projectDefects: List<Defect>,
+        artifacts: List<Artifact>,
         projectCost: Double
     ): List<ArtifactTypeDefectSummary> {
-        val defectsByArtifactType = projectDefects.groupBy { it.artifactTypeId }
+        val defectsByArtifactType = projectDefects.groupBy { defect ->
+            val artifact = artifacts.find { it.id.toString() == defect.artifactId }
+                ?: throw IllegalStateException("Artifact not found")
+
+            artifact.artifactTypeId
+        }
 
         return defectsByArtifactType.map { pair ->
             val (artifactTypeId, defects) = pair
@@ -205,7 +216,7 @@ class DashboardService(
 
     private fun calculateCountAndCostForSeverity(
         severity: Severity,
-        defects: List<DashboardDefect>,
+        defects: List<Defect>,
         cost: Double
     ): CountAndCost {
         val defectsOfSeverity = defects.filter { defect -> defect.severity == severity }
@@ -215,21 +226,5 @@ class DashboardService(
             count = defectsOfSeverity.size,
             cost = severityPercentage * cost
         )
-    }
-
-    private suspend fun getDefects(inspections: List<Inspection>): List<DashboardDefect> {
-        val answers = inspections.flatMap { inspection -> inspectionAnswerRepository.findByInspectionId(inspection.id) }
-        val negativeAnswers = answers.filter { it.answerOption == AnswerOption.No }
-
-        return negativeAnswers.map { answer ->
-            val question = questionRepository.findById(answer.questionId)
-                ?: throw IllegalStateException("Question not found")
-
-            DashboardDefect(
-                defectTypeId = question.defectTypeId,
-                artifactTypeId = question.artifactTypeId,
-                severity = question.severity
-            )
-        }
     }
 }

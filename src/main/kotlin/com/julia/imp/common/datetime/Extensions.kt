@@ -8,3 +8,9 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 inline fun <T> Iterable<T>.sumOfDuration(selector: (T) -> Duration): Duration =
     this.sumOf { selector(it).inWholeMilliseconds }.milliseconds
+
+/**
+ * Sum all durations in the iterable.
+ */
+fun Iterable<Duration>.sumOfDuration(): Duration =
+    this.sumOf { it.inWholeMilliseconds }.milliseconds

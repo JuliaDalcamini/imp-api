@@ -8,7 +8,6 @@ import com.julia.imp.inspection.inspectionRoutes
 import com.julia.imp.project.dashboard.dashboardRoutes
 import com.julia.imp.project.projectRoutes
 import com.julia.imp.question.questionRoutes
-import com.julia.imp.report.reportRoutes
 import com.julia.imp.team.inspector.inspectorRoutes
 import com.julia.imp.team.member.teamMemberRoutes
 import com.julia.imp.team.teamRoutes
@@ -21,7 +20,6 @@ fun Application.configureRouting() {
         artifactRoutes()
         artifactTypeRoutes()
         projectRoutes()
-        reportRoutes()
         dashboardRoutes()
         teamRoutes()
         teamMemberRoutes()

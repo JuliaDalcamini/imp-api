@@ -18,7 +18,6 @@ import com.julia.imp.project.ProjectService
 import com.julia.imp.project.dashboard.DashboardService
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.question.QuestionService
-import com.julia.imp.report.ReportService
 import com.julia.imp.team.TeamRepository
 import com.julia.imp.team.TeamService
 import com.julia.imp.team.inspector.InspectorService
@@ -57,50 +56,15 @@ fun Application.configureDependencyInjection() {
                 single<ArtifactTypeRepository> { ArtifactTypeRepository(get()) }
                 single<QuestionRepository> { QuestionRepository(get()) }
                 single<QuestionService> { QuestionService(get(), get()) }
-                single<InspectionRepository> { InspectionRepository(get()) }
-                single<InspectionService> {
-                    InspectionService(
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get()
-                    )
-                }
-                single<InspectionAnswerRepository> { InspectionAnswerRepository(get()) }
-                single<DashboardService> {
-                    DashboardService(
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get()
-                    )
-                }
-                single<ReportService> {
-                    ReportService(
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get(),
-                        get()
-                    )
-                }
+                single<DashboardService> { DashboardService(get(), get(), get(), get(), get(), get(), get(), get()) }
                 single<DefectRepository> { DefectRepository(get()) }
                 single<DefectService> { DefectService(get(), get(), get(), get(), get()) }
+                single<InspectionRepository> { InspectionRepository(get()) }
+                single<InspectionAnswerRepository> { InspectionAnswerRepository(get()) }
+
+                single<InspectionService> {
+                    InspectionService(get(), get(), get(), get(), get(), get(), get(), get(), get())
+                }
             }
         )
     }
