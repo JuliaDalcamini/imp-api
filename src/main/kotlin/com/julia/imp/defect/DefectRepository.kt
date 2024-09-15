@@ -24,11 +24,16 @@ class DefectRepository(database: MongoDatabase) : CrudRepository<Defect>() {
             .find(Filters.and(Filters.eq("projectId", projectId)))
             .toList()
 
+    private suspend fun findByArtifactId(artifactId: String): List<Defect> =
+        collection
+            .find(Filters.and(Filters.eq("artifactId", artifactId)))
+            .toList()
+
     suspend fun findFiltered(artifactId: String, filter: DefectFilter): List<Defect> =
         when (filter) {
             DefectFilter.NotFixed -> findNotFixedByArtifactId(artifactId)
             DefectFilter.Fixed -> findFixedByArtifactId(artifactId)
-            DefectFilter.All -> findByProjectId(artifactId)
+            DefectFilter.All -> findByArtifactId(artifactId)
         }
 
     private suspend fun findNotFixedByArtifactId(artifactId: String) =

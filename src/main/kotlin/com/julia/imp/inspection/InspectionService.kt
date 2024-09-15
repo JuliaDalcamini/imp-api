@@ -115,7 +115,12 @@ class InspectionService(
 
     private suspend fun updateArtifactInspectionState(artifact: Artifact, project: Project) {
         val inspections = repository.findByArtifactId(artifact.id.toString())
-        val inspectionCount = inspections.count { it.artifactVersion == artifact.currentVersion }
+
+        val eligibleInspections = inspections
+            .filter { it.artifactVersion == artifact.currentVersion }
+            .distinctBy { it.inspectorId }
+
+        val inspectionCount = eligibleInspections.count { it.artifactVersion == artifact.currentVersion }
         val inspected = inspectionCount >= project.minInspectors
 
         if (inspected != artifact.inspected) {

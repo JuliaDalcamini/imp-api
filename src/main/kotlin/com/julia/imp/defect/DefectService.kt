@@ -7,10 +7,12 @@ import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
+import com.julia.imp.team.member.isAdmin
 import com.julia.imp.team.member.isMember
+import io.ktor.server.plugins.NotFoundException
 
 class DefectService(
-    private val defectRepository: DefectRepository,
+    private val repository: DefectRepository,
     private val defectTypeRepository: DefectTypeRepository,
     private val projectRepository: ProjectRepository,
     private val artifactRepository: ArtifactRepository,
@@ -35,7 +37,7 @@ class DefectService(
         val artifact = artifactRepository.findById(artifactId)
             ?: throw IllegalStateException("Artifact not found")
 
-        val defects = defectRepository.findFiltered(
+        val defects = repository.findFiltered(
             artifactId = artifact.id.toString(),
             filter = filter
         )
@@ -57,6 +59,56 @@ class DefectService(
                 question = question
             )
         }
+    }
+
+    suspend fun update(
+        request: UpdateDefectRequest,
+        defectId: String,
+        artifactId: String,
+        projectId: String,
+        loggedUserId: String
+    ): DefectResponse {
+        if (!isUserAdmin(loggedUserId, projectId)) {
+            throw UnauthorizedError("Only admin can update artifacts")
+        }
+
+        val artifact = artifactRepository.findById(artifactId)
+            ?: throw NotFoundException("Artifact not found")
+
+        val oldDefect = repository.findById(defectId)
+            ?: throw NotFoundException("Artifact not found")
+
+        if (projectId != artifact.projectId || oldDefect.artifactId != artifactId || oldDefect.projectId != projectId) {
+            throw NotFoundException("Defect not found")
+        }
+
+        val updatedDefect = oldDefect.copy(fixed = request.fixed)
+
+        repository.replaceById(
+            id = oldDefect.id.toString(),
+            item = updatedDefect
+        )
+
+        val type = defectTypeRepository.findById(updatedDefect.defectTypeId)
+            ?: throw IllegalStateException("Defect type not found")
+
+        val answer = inspectionAnswerRepository.findById(updatedDefect.answerId)
+            ?: throw IllegalStateException("Answer not found")
+
+        val question = questionRepository.findById(answer.questionId)
+            ?: throw IllegalStateException("Question not found")
+
+        return DefectResponse.of(
+            defect = updatedDefect,
+            defectType = type,
+            artifact = artifact,
+            question = question
+        )
+    }
+
+    private suspend fun isUserAdmin(loggedUserId: String, projectId: String): Boolean {
+        val project = projectRepository.findById(projectId) ?: return false
+        return teamMemberRepository.isAdmin(loggedUserId, project.teamId)
     }
 
     private suspend fun isUserMember(loggedUserId: String, projectId: String): Boolean {
