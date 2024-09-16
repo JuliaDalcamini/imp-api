@@ -2,11 +2,12 @@ package com.julia.imp.project.dashboard
 
 import com.julia.imp.auth.user.UserResponse
 import kotlinx.serialization.Serializable
+import kotlin.time.Duration
 
 @Serializable
-data class InspectorProgress(
+data class InspectorSummary(
     val inspector: UserResponse,
-    val percentage: Double,
-    val count: Int,
-    val total: Int
+    val totalEffort: Duration,
+    val totalCost: Double,
+    val progress: Progress
 )

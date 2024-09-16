@@ -46,18 +46,13 @@ class DashboardService(
         val artifacts = artifactRepository.findByProjectId(projectId)
         val defects = defectRepository.findByProjectId(projectId)
         val inspections = artifacts.flatMap { inspectionRepository.findByArtifactId(it.id) }
-        val inspectors = getProjectInspectors(projectId)
         val artifactsWithInspections = getArtifactsWithInspections(artifacts, inspections)
-
-        val inspectorsProgress = inspectors.mapNotNull { inspector ->
-            calculateInspectorProgress(artifacts, inspector)
-        }
-
+        val inspectorSummaries = calculateInspectorSummaries(artifacts, inspections)
         val inspectionProgress = calculateInspectionProgress(artifacts)
         val defectsProgress = calculateDefectsProgress(defects)
         val effortOverview = calculateEffortOverview(artifactsWithInspections, inspections)
         val costOverview = calculateCostOverview(artifactsWithInspections, inspections)
-        val defectsByArtifactType = calculateDefectsByArtifactType(defects, artifacts, costOverview.total)
+        val artifactTypeSummaries = calculateArtifactTypeSummaries(defects, artifacts, inspections)
         val defectsByDefectType = calculateDefectsByDefectType(defects, costOverview.total, effortOverview.total)
 
         return DashboardResponse(
@@ -65,8 +60,8 @@ class DashboardService(
             defectsProgress = defectsProgress,
             effortOverview = effortOverview,
             costOverview = costOverview,
-            inspectorsProgress = inspectorsProgress,
-            artifactTypes = defectsByArtifactType,
+            inspectors = inspectorSummaries,
+            artifactTypes = artifactTypeSummaries,
             defectTypes = defectsByDefectType
         )
     }
@@ -93,18 +88,6 @@ class DashboardService(
             count = fixedDefects.size,
             total = total
         )
-    }
-
-    private suspend fun getProjectInspectors(projectId: String): List<UserResponse> {
-        val project = projectRepository.findById(projectId)
-            ?: throw NotFoundException("Project not found")
-
-        val inspectors = teamMemberRepository.findInspectorsByTeamId(project.teamId)
-
-        return inspectors.mapNotNull { inspector ->
-            val user = userRepository.findById(inspector.userId)
-            user?.let { UserResponse.of(it) }
-        }
     }
 
     private fun getArtifactsWithInspections(artifacts: List<Artifact>, inspections: List<Inspection>): List<Artifact> {
@@ -142,29 +125,56 @@ class DashboardService(
         )
     }
 
-    private suspend fun calculateInspectorProgress(
-        artifacts: List<Artifact>,
-        inspector: UserResponse
-    ): InspectorProgress? {
-        val inspectorArtifacts = artifacts.filter { it.inspectorIds.contains(inspector.id) && !it.archived}
-        val total = inspectorArtifacts.size
+    private suspend fun calculateInspectorSummaries(
+        projectArtifacts: List<Artifact>,
+        projectInspections: List<Inspection>
+    ): List<InspectorSummary> {
+        val inspectionsByInspector = projectInspections.groupBy { it.inspectorId }
 
-        return if (total > 0) {
-            val inspected = inspectorArtifacts.count { artifact ->
-                val inspection = inspectionRepository.findByArtifactId(artifact.id)
-                    .filter { it.inspectorId == inspector.id }
-                    .maxByOrNull { it.createdAt }
+        return inspectionsByInspector.map { pair ->
+            val (inspectorId, inspections) = pair
+            val validArtifacts = projectArtifacts.filter { it.inspectorIds.contains(inspectorId) && !it.archived }
+            val validArtifactIds = validArtifacts.map { it.id.toString() }
 
-                inspection?.artifactVersion == artifact.currentVersion
+            val validInspections = inspections.filter {
+                it.inspectorId == inspectorId && it.artifactId in validArtifactIds
             }
 
-            InspectorProgress(
-                inspector = inspector,
-                percentage = inspected.toDouble() / total,
-                count = inspected,
-                total = total
+            val progress = if (validArtifacts.isNotEmpty()) {
+                val inspected = validArtifacts.count { artifact ->
+                    val inspection = validInspections
+                        .filter { it.artifactId == artifact.id.toString() }
+                        .maxByOrNull { it.createdAt }
+
+                    inspection?.artifactVersion == artifact.currentVersion
+                }
+
+                Progress(
+                    percentage = inspected.toDouble() / validArtifacts.size,
+                    count = inspected,
+                    total = validArtifacts.size
+                )
+            } else {
+                Progress(
+                    percentage = 0.0,
+                    count = 0,
+                    total = 0
+                )
+            }
+
+            val inspector = userRepository.findById(inspectorId)
+                ?: throw IllegalStateException("Inspector not found")
+
+            val totalEffort = inspections.sumOfDuration { it.duration }
+            val totalCost = inspections.sumOf { it.cost }
+
+            InspectorSummary(
+                inspector = UserResponse.of(inspector),
+                totalEffort = totalEffort,
+                totalCost = totalCost,
+                progress = progress
             )
-        } else null
+        }
     }
 
     private suspend fun calculateDefectsByDefectType(
@@ -192,38 +202,47 @@ class DashboardService(
         }
     }
 
-    private suspend fun calculateDefectsByArtifactType(
+    private suspend fun calculateArtifactTypeSummaries(
         projectDefects: List<Defect>,
-        artifacts: List<Artifact>,
-        projectCost: Double
-    ): List<ArtifactTypeDefectSummary> {
+        projectArtifacts: List<Artifact>,
+        projectInspections: List<Inspection>
+    ): List<ArtifactTypeSummary> {
         val defectsByArtifactType = projectDefects.groupBy { defect ->
-            val artifact = artifacts.find { it.id.toString() == defect.artifactId }
+            val artifact = projectArtifacts.find { it.id.toString() == defect.artifactId }
                 ?: throw IllegalStateException("Artifact not found")
 
             artifact.artifactTypeId
         }
 
-        return defectsByArtifactType.map { pair ->
-            val (artifactTypeId, defects) = pair
+        val inspectionsByArtifactType = projectInspections.groupBy { inspection ->
+            val artifact = projectArtifacts.find { it.id.toString() == inspection.artifactId }
+                ?: throw IllegalStateException("Artifact not found")
+
+            artifact.artifactTypeId
+        }
+
+        return inspectionsByArtifactType.map { pair ->
+            val (artifactTypeId, inspections) = pair
+            val defects = defectsByArtifactType[artifactTypeId].orEmpty()
 
             val artifactType = artifactTypeRepository.findById(artifactTypeId)
                 ?: throw IllegalStateException("Artifact type not found")
 
             val percentage = percentage(defects.size, projectDefects.size)
+            val totalCost = inspections.sumOf { it.cost }
+            val totalEffort = inspections.sumOfDuration { it.duration }
 
-            val totals = CountAndCost(
-                count = defects.size,
-                cost = projectCost * percentage
-            )
-
-            ArtifactTypeDefectSummary(
+            ArtifactTypeSummary(
                 artifactType = ArtifactTypeResponse.of(artifactType),
-                percentage = percentage,
-                total = totals,
-                lowSeverity = calculateCountAndCostForSeverity(Severity.Low, defects, totals.cost),
-                mediumSeverity = calculateCountAndCostForSeverity(Severity.Medium, defects, totals.cost),
-                highSeverity = calculateCountAndCostForSeverity(Severity.High, defects, totals.cost)
+                totalEffort = totalEffort,
+                totalCost = totalCost,
+                defects = ArtifactTypeDefects(
+                    percentage = percentage,
+                    total = CountAndCost(count = defects.size, cost = totalCost),
+                    lowSeverity = calculateCountAndCostForSeverity(Severity.Low, defects, totalCost),
+                    mediumSeverity = calculateCountAndCostForSeverity(Severity.Medium, defects, totalCost),
+                    highSeverity = calculateCountAndCostForSeverity(Severity.High, defects, totalCost)
+                )
             )
         }
     }
