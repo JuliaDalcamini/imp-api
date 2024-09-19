@@ -9,7 +9,7 @@ import com.julia.imp.auth.refresh.RefreshTokenRepository
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.defect.DefectRepository
 import com.julia.imp.defect.DefectService
-import com.julia.imp.defecttype.DefectTypeRepository
+import com.julia.imp.defect.type.DefectTypeRepository
 import com.julia.imp.inspection.InspectionRepository
 import com.julia.imp.inspection.InspectionService
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
@@ -25,8 +25,7 @@ import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.TeamMemberService
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
+import io.ktor.server.application.*
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 

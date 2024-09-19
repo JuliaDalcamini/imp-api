@@ -3,7 +3,7 @@ package com.julia.imp.inspection.answer
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.defect.Defect
 import com.julia.imp.defect.DefectResponse
-import com.julia.imp.defecttype.DefectType
+import com.julia.imp.defect.type.DefectType
 import com.julia.imp.question.Question
 import com.julia.imp.question.QuestionResponse
 import kotlinx.serialization.Serializable

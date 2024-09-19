@@ -1,6 +1,6 @@
 package com.julia.imp.project.dashboard
 
-import com.julia.imp.defecttype.DefectTypeResponse
+import com.julia.imp.defect.type.DefectTypeResponse
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 

@@ -2,8 +2,8 @@ package com.julia.imp.defect
 
 import com.julia.imp.artifact.Artifact
 import com.julia.imp.artifact.ArtifactReference
-import com.julia.imp.defecttype.DefectType
-import com.julia.imp.defecttype.DefectTypeResponse
+import com.julia.imp.defect.type.DefectType
+import com.julia.imp.defect.type.DefectTypeResponse
 import com.julia.imp.question.Question
 import com.julia.imp.question.QuestionResponse
 import com.julia.imp.question.Severity

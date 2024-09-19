@@ -6,7 +6,7 @@ import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.common.networking.error.UnauthorizedError
 import com.julia.imp.defect.Defect
 import com.julia.imp.defect.DefectRepository
-import com.julia.imp.defecttype.DefectTypeRepository
+import com.julia.imp.defect.type.DefectTypeRepository
 import com.julia.imp.inspection.answer.AnswerOption
 import com.julia.imp.inspection.answer.InspectionAnswer
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
@@ -17,7 +17,7 @@ import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.canInspect
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.NotFoundException
+import io.ktor.server.plugins.*
 import kotlinx.datetime.Clock
 import kotlin.time.DurationUnit
 

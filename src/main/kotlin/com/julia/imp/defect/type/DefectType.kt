@@ -1,4 +1,4 @@
-package com.julia.imp.defecttype
+package com.julia.imp.defect.type
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName

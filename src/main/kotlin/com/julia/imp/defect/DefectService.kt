@@ -2,14 +2,14 @@ package com.julia.imp.defect
 
 import com.julia.imp.artifact.ArtifactRepository
 import com.julia.imp.common.networking.error.UnauthorizedError
-import com.julia.imp.defecttype.DefectTypeRepository
+import com.julia.imp.defect.type.DefectTypeRepository
 import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isAdmin
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.NotFoundException
+import io.ktor.server.plugins.*
 
 class DefectService(
     private val repository: DefectRepository,
