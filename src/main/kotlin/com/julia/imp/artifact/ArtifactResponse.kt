@@ -23,12 +23,20 @@ data class ArtifactResponse(
     val lastModification: Instant,
     val currentVersion: String,
     val totalCost: Double,
-    val fullyInspected: Boolean
+    val fullyInspected: Boolean,
+    val inspectedByUser: Boolean
 ) {
 
     companion object {
 
-        fun of(artifact: Artifact, artifactType: ArtifactType, inspectors: List<User>, prioritizer: Prioritizer, totalCost: Double) =
+        fun of(
+            artifact: Artifact,
+            artifactType: ArtifactType,
+            inspectors: List<User>,
+            prioritizer: Prioritizer,
+            totalCost: Double,
+            inspectedByUser: Boolean
+        ) =
             ArtifactResponse(
                 id = artifact.id.toString(),
                 name = artifact.name,
@@ -42,7 +50,8 @@ data class ArtifactResponse(
                 lastModification = artifact.lastModification,
                 currentVersion = artifact.currentVersion,
                 totalCost = totalCost,
-                fullyInspected = artifact.inspected
+                fullyInspected = artifact.inspected,
+                inspectedByUser = inspectedByUser
             )
     }
 }
