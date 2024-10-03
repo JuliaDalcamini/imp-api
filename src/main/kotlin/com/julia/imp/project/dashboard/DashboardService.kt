@@ -6,6 +6,8 @@ import com.julia.imp.artifact.type.ArtifactTypeRepository
 import com.julia.imp.artifact.type.ArtifactTypeResponse
 import com.julia.imp.auth.user.UserRepository
 import com.julia.imp.auth.user.UserResponse
+import com.julia.imp.common.datetime.atEndOfDay
+import com.julia.imp.common.datetime.atStartOfDay
 import com.julia.imp.common.datetime.sumOfDuration
 import com.julia.imp.common.math.average
 import com.julia.imp.common.math.percentage
@@ -17,12 +19,14 @@ import com.julia.imp.defect.type.DefectTypeRepository
 import com.julia.imp.defect.type.DefectTypeResponse
 import com.julia.imp.inspection.Inspection
 import com.julia.imp.inspection.InspectionRepository
+import com.julia.imp.project.Project
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.question.Severity
 import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.*
+import io.ktor.server.plugins.NotFoundException
 import kotlin.time.Duration
+import kotlinx.datetime.Clock
 
 class DashboardService(
     private val userRepository: UserRepository,
@@ -54,6 +58,7 @@ class DashboardService(
         val costOverview = calculateCostOverview(artifactsWithInspections, inspections)
         val artifactTypeSummaries = calculateArtifactTypeSummaries(defects, artifacts, inspections)
         val defectsByDefectType = calculateDefectsByDefectType(defects, costOverview.total, effortOverview.total)
+        val performanceScore = calculatePerformanceScore(project, inspectionProgress)
 
         return DashboardResponse(
             inspectionProgress = inspectionProgress,
@@ -62,7 +67,8 @@ class DashboardService(
             costOverview = costOverview,
             inspectors = inspectorSummaries,
             artifactTypes = artifactTypeSummaries,
-            defectTypes = defectsByDefectType
+            defectTypes = defectsByDefectType,
+            performanceScore = performanceScore
         )
     }
 
@@ -76,6 +82,23 @@ class DashboardService(
             count = inspectedArtifacts.size,
             total = total
         )
+    }
+
+    private fun calculatePerformanceScore(project: Project, inspectionProgress: Progress): PerformanceScore {
+        val expectedDuration = project.targetDate.atEndOfDay() - project.startDate.atStartOfDay()
+        val elapsedDuration = (project.finishedAt ?: Clock.System.now()) - project.startDate.atStartOfDay()
+        val elapsedDurationPercentage = elapsedDuration / expectedDuration
+
+        return if (elapsedDurationPercentage > 0) {
+            val idi = inspectionProgress.percentage / elapsedDurationPercentage
+
+            when {
+                idi >= .9 -> PerformanceScore.A
+                idi >= .8 -> PerformanceScore.B
+                idi >= .7 -> PerformanceScore.C
+                else -> PerformanceScore.D
+            }
+        } else PerformanceScore.A
     }
 
     private fun calculateDefectsProgress(defects: List<Defect>): Progress {

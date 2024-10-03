@@ -12,6 +12,7 @@ import com.julia.imp.team.member.TeamMemberRepository
 import com.julia.imp.team.member.isAdmin
 import com.julia.imp.team.member.isMember
 import io.ktor.server.plugins.NotFoundException
+import kotlinx.datetime.Clock
 
 class ProjectService(
     private val repository: ProjectRepository,
@@ -79,7 +80,8 @@ class ProjectService(
                 prioritizer = request.prioritizer,
                 minInspectors = request.minInspectors,
                 teamId = request.teamId,
-                finished = false
+                finished = false,
+                finishedAt = null
             )
         )
     }
@@ -103,7 +105,8 @@ class ProjectService(
                 minInspectors = request.minInspectors,
                 startDate = request.startDate,
                 targetDate = request.targetDate,
-                finished = request.finished
+                finished = request.finished,
+                finishedAt = if (request.finished) Clock.System.now() else null
             )
         )
 

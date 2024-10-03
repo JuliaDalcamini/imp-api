@@ -7,9 +7,9 @@ import com.julia.imp.inspection.answer.InspectionAnswerRepository
 import com.julia.imp.project.ProjectRepository
 import com.julia.imp.question.QuestionRepository
 import com.julia.imp.team.member.TeamMemberRepository
-import com.julia.imp.team.member.isAdmin
+import com.julia.imp.team.member.canInspect
 import com.julia.imp.team.member.isMember
-import io.ktor.server.plugins.*
+import io.ktor.server.plugins.NotFoundException
 
 class DefectService(
     private val repository: DefectRepository,
@@ -68,8 +68,8 @@ class DefectService(
         projectId: String,
         loggedUserId: String
     ): DefectResponse {
-        if (!isUserAdmin(loggedUserId, projectId)) {
-            throw UnauthorizedError("Only admin can update artifacts")
+        if (!canUserInspect(loggedUserId, projectId)) {
+            throw UnauthorizedError("Only admin or inspectors can update defects")
         }
 
         val artifact = artifactRepository.findById(artifactId)
@@ -106,13 +106,13 @@ class DefectService(
         )
     }
 
-    private suspend fun isUserAdmin(loggedUserId: String, projectId: String): Boolean {
-        val project = projectRepository.findById(projectId) ?: return false
-        return teamMemberRepository.isAdmin(loggedUserId, project.teamId)
-    }
-
     private suspend fun isUserMember(loggedUserId: String, projectId: String): Boolean {
         val project = projectRepository.findById(projectId) ?: return false
         return teamMemberRepository.isMember(loggedUserId, project.teamId)
+    }
+
+    private suspend fun canUserInspect(loggedUserId: String, projectId: String): Boolean {
+        val project = projectRepository.findById(projectId) ?: return false
+        return teamMemberRepository.canInspect(loggedUserId, project.teamId)
     }
 }
